@@ -1,5 +1,10 @@
+
 from fastapi import FastAPI
-from auth import hash_password, verify_password
+from auth import (
+    hash_password,
+    verify_password,
+    create_access_token
+)
 from database import engine, SessionLocal
 from models import Base, User
 from schemas import UserCreate, UserLogin
@@ -74,6 +79,11 @@ def login(user: UserLogin):
             "message": "Invalid password"
         }
 
+    token = create_access_token(
+    {"email": db_user.email}
+)
+
     return {
-        "message": "Login successful"
-    }
+    "access_token": token,
+    "token_type": "bearer"
+}
