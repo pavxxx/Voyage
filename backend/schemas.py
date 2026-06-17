@@ -2,6 +2,11 @@ from pydantic import BaseModel
 
 class UserCreate(BaseModel):
     name: str
+
+    email: str
+
+    password: str
+
     budget: str
 
     food_score: int
@@ -10,3 +15,7 @@ class UserCreate(BaseModel):
     shopping_score: int
 
     travel_style: str
+
+class UserLogin(BaseModel):
+    email: str
+    password: str

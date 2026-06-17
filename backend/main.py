@@ -1,8 +1,8 @@
 from fastapi import FastAPI
-
+from auth import hash_password, verify_password
 from database import engine, SessionLocal
 from models import Base, User
-from schemas import UserCreate
+from schemas import UserCreate, UserLogin
 
 app = FastAPI()
 
@@ -20,14 +20,19 @@ def create_user(user: UserCreate):
     db = SessionLocal()
 
     new_user = User(
-        name=user.name,
-        budget=user.budget,
-        food_score=user.food_score,
-        adventure_score=user.adventure_score,
-        culture_score=user.culture_score,
-        shopping_score=user.shopping_score,
-        travel_style=user.travel_style
-    )
+    name=user.name,
+    email=user.email,
+    password=hash_password(user.password),
+
+    budget=user.budget,
+
+    food_score=user.food_score,
+    adventure_score=user.adventure_score,
+    culture_score=user.culture_score,
+    shopping_score=user.shopping_score,
+
+    travel_style=user.travel_style
+)
 
     db.add(new_user)
     db.commit()
@@ -46,3 +51,29 @@ def get_users():
     users = db.query(User).all()
 
     return users
+
+@app.post("/login")
+def login(user: UserLogin):
+
+    db = SessionLocal()
+
+    db_user = db.query(User).filter(
+        User.email == user.email
+    ).first()
+
+    if not db_user:
+        return {
+            "message": "User not found"
+        }
+
+    if not verify_password(
+        user.password,
+        db_user.password
+    ):
+        return {
+            "message": "Invalid password"
+        }
+
+    return {
+        "message": "Login successful"
+    }

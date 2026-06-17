@@ -8,6 +8,10 @@ class User(Base):
 
     name = Column(String)
 
+    email = Column(String, unique=True)
+
+    password = Column(String)
+
     budget = Column(String)
 
     food_score = Column(Integer)
