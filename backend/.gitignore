@@ -1,0 +1,6 @@
+venv/
+__pycache__/
+travel.db
+.env
+.pytest_cache/
+*.pyc
