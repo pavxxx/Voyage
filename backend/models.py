@@ -1,4 +1,5 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import relationship
 from database import Base
 
 class User(Base):
@@ -23,6 +24,7 @@ class User(Base):
     shopping_score = Column(Integer)
 
     travel_style = Column(String)
+    trips = relationship("Trip", back_populates="user")
 
 class Trip(Base):
     __tablename__ = "trips"
@@ -37,4 +39,12 @@ class Trip(Base):
 
     budget = Column(String)
 
-    user_id = Column(Integer)
+    user_id = Column(
+    Integer,
+    ForeignKey("users.id")
+)
+
+    user = relationship(
+    "User",
+    back_populates="trips"
+)
