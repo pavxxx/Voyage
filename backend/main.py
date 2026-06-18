@@ -1,16 +1,20 @@
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
+from fastapi.security import OAuth2PasswordBearer
 from auth import (
     hash_password,
     verify_password,
-    create_access_token
+    create_access_token,
+    verify_token
 )
 from database import engine, SessionLocal
 from models import Base, User, Trip
 from schemas import UserCreate, UserLogin, TripCreate 
 
 app = FastAPI()
-
+oauth2_scheme = OAuth2PasswordBearer(
+    tokenUrl="login"
+)
 Base.metadata.create_all(bind=engine)
 
 
@@ -120,3 +124,17 @@ def get_trips():
     trips = db.query(Trip).all()
 
     return trips
+
+@app.get("/me")
+def get_me(token: str = Depends(oauth2_scheme)):
+
+    email = verify_token(token)
+
+    if not email:
+        return {
+            "message": "Invalid token"
+        }
+
+    return {
+        "email": email
+    }

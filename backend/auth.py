@@ -1,6 +1,7 @@
 from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timedelta
+from jose import jwt, JWTError
 
 pwd_context = CryptContext(
     schemes=["bcrypt"],
@@ -39,3 +40,21 @@ def create_access_token(data: dict):
         SECRET_KEY,
         algorithm=ALGORITHM
     )
+
+def verify_token(token: str):
+
+    try:
+
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM]
+        )
+
+        email = payload.get("email")
+
+        return email
+
+    except JWTError:
+
+        return None
