@@ -23,3 +23,18 @@ class User(Base):
     shopping_score = Column(Integer)
 
     travel_style = Column(String)
+
+class Trip(Base):
+    __tablename__ = "trips"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    destination = Column(String)
+
+    start_date = Column(String)
+
+    end_date = Column(String)
+
+    budget = Column(String)
+
+    user_id = Column(Integer)

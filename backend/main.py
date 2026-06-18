@@ -6,8 +6,8 @@ from auth import (
     create_access_token
 )
 from database import engine, SessionLocal
-from models import Base, User
-from schemas import UserCreate, UserLogin
+from models import Base, User, Trip
+from schemas import UserCreate, UserLogin, TripCreate 
 
 app = FastAPI()
 
@@ -87,3 +87,36 @@ def login(user: UserLogin):
     "access_token": token,
     "token_type": "bearer"
 }
+
+@app.post("/trip")
+def create_trip(trip: TripCreate):
+
+    db = SessionLocal()
+
+    new_trip = Trip(
+        destination=trip.destination,
+        start_date=trip.start_date,
+        end_date=trip.end_date,
+        budget=trip.budget,
+        user_id=trip.user_id
+    )
+
+    db.add(new_trip)
+
+    db.commit()
+
+    db.refresh(new_trip)
+
+    return {
+        "message": "Trip created successfully",
+        "trip_id": new_trip.id
+    }
+
+@app.get("/trips")
+def get_trips():
+
+    db = SessionLocal()
+
+    trips = db.query(Trip).all()
+
+    return trips

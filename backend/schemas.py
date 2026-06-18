@@ -19,3 +19,14 @@ class UserCreate(BaseModel):
 class UserLogin(BaseModel):
     email: str
     password: str
+
+class TripCreate(BaseModel):
+    destination: str
+
+    start_date: str
+
+    end_date: str
+
+    budget: str
+
+    user_id: int
