@@ -1,5 +1,3 @@
-
-from fastapi import FastAPI, Depends
 from fastapi.security import OAuth2PasswordBearer
 from auth import (
     hash_password,
@@ -9,7 +7,13 @@ from auth import (
 )
 from database import engine, SessionLocal
 from models import Base, User, Trip
-from schemas import UserCreate, UserLogin, TripCreate 
+from schemas import (
+    UserCreate,
+    UserLogin,
+    TripCreate,
+    UserResponse
+)
+from fastapi import FastAPI, Depends, HTTPException
 
 app = FastAPI()
 oauth2_scheme = OAuth2PasswordBearer(
@@ -17,6 +21,25 @@ oauth2_scheme = OAuth2PasswordBearer(
 )
 Base.metadata.create_all(bind=engine)
 
+def get_current_user(
+    token: str = Depends(oauth2_scheme)
+):
+
+    email = verify_token(token)
+
+    if not email:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token"
+        )
+
+    db = SessionLocal()
+
+    user = db.query(User).filter(
+        User.email == email
+    ).first()
+
+    return user
 
 @app.get("/")
 def home():
@@ -93,7 +116,10 @@ def login(user: UserLogin):
 }
 
 @app.post("/trip")
-def create_trip(trip: TripCreate):
+def create_trip(
+    trip: TripCreate,
+    current_user: User = Depends(get_current_user)
+):
 
     db = SessionLocal()
 
@@ -102,13 +128,11 @@ def create_trip(trip: TripCreate):
         start_date=trip.start_date,
         end_date=trip.end_date,
         budget=trip.budget,
-        user_id=trip.user_id
+        user_id=current_user.id
     )
 
     db.add(new_trip)
-
     db.commit()
-
     db.refresh(new_trip)
 
     return {
@@ -138,3 +162,16 @@ def get_me(token: str = Depends(oauth2_scheme)):
     return {
         "email": email
     }
+
+@app.get("/my-trips")
+def get_my_trips(
+    current_user: User = Depends(get_current_user)
+):
+
+    db = SessionLocal()
+
+    trips = db.query(Trip).filter(
+        Trip.user_id == current_user.id
+    ).all()
+
+    return trips

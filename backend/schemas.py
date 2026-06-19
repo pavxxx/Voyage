@@ -22,11 +22,9 @@ class UserLogin(BaseModel):
 
 class TripCreate(BaseModel):
     destination: str
-
     start_date: str
-
     end_date: str
-
     budget: str
 
-    user_id: int
+class UserResponse(BaseModel):
+    email: str
