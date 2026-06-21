@@ -183,3 +183,29 @@ def get_my_trips(
     ).all()
 
     return trips
+
+@app.delete("/trip/{trip_id}")
+def delete_trip(
+    trip_id: int,
+    current_user: User = Depends(get_current_user)
+):
+
+    db = SessionLocal()
+
+    trip = db.query(Trip).filter(
+        Trip.id == trip_id,
+        Trip.user_id == current_user.id
+    ).first()
+
+    if not trip:
+        return {
+            "message": "Trip not found"
+        }
+
+    db.delete(trip)
+
+    db.commit()
+
+    return {
+        "message": "Trip deleted successfully"
+    }
