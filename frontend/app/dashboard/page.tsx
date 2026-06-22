@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import {
     getMyTrips,
     deleteTrip,
-    getRecommendations
+    getRecommendations,
+    getProfile
 } from "@/lib/api";
 
 interface Trip {
@@ -16,11 +17,23 @@ interface Trip {
     budget: string;
 }
 
+interface Profile {
+    name: string;
+    budget: string;
+    travel_style: string;
+}
+
 export default function DashboardPage() {
 
     const [trips, setTrips] = useState<Trip[]>([]);
     const [personality, setPersonality] = useState("");
     const [recommendations, setRecommendations] = useState<string[]>([]);
+
+    const [profile, setProfile] = useState<Profile>({
+        name: "",
+        budget: "",
+        travel_style: ""
+    });
 
     useEffect(() => {
 
@@ -32,24 +45,43 @@ export default function DashboardPage() {
 
             if (!token) return;
 
-            const tripData = await getMyTrips(
-                token
-            );
+            try {
 
-            setTrips(tripData);
+                const [
+                    tripData,
+                    recData,
+                    profileData
+                ] = await Promise.all([
+                    getMyTrips(token),
+                    getRecommendations(token),
+                    getProfile(token)
+                ]);
 
-            const recData =
-                await getRecommendations(
-                    token
+                setTrips(tripData);
+
+                setPersonality(
+                    recData.personality
                 );
 
-            setPersonality(
-                recData.personality
-            );
+                setRecommendations(
+                    recData.recommendations
+                );
 
-            setRecommendations(
-                recData.recommendations
-            );
+                setProfile({
+                    name: profileData.name || "",
+                    budget: profileData.budget || "",
+                    travel_style:
+                        profileData.travel_style || ""
+                });
+
+            } catch (error) {
+
+                console.error(
+                    "Dashboard fetch error:",
+                    error
+                );
+
+            }
         };
 
         fetchData();
@@ -94,7 +126,7 @@ export default function DashboardPage() {
                     </h1>
 
                     <h2 className="text-6xl font-bold text-zinc-500">
-                        Pavithra
+                        {profile.name}
                     </h2>
                 </div>
 
@@ -113,8 +145,8 @@ export default function DashboardPage() {
                         Travel Style
                     </p>
 
-                    <h2 className="mt-2 text-3xl font-bold">
-                        Solo Explorer
+                    <h2 className="mt-2 text-3xl font-bold capitalize">
+                        {profile.travel_style || "Not Set"}
                     </h2>
                 </div>
 
@@ -123,8 +155,8 @@ export default function DashboardPage() {
                         Budget Profile
                     </p>
 
-                    <h2 className="mt-2 text-3xl font-bold text-orange-400">
-                        Medium
+                    <h2 className="mt-2 text-3xl font-bold text-orange-400 capitalize">
+                        {profile.budget || "Not Set"}
                     </h2>
                 </div>
 

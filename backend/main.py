@@ -255,3 +255,17 @@ def get_recommendations(
         "recommendations":
         recommendations[personality]
     }
+
+@app.get("/profile")
+def get_profile(
+    current_user: User = Depends(get_current_user)
+):
+    return {
+        "name": current_user.name,
+        "budget": current_user.budget,
+        "travel_style": current_user.travel_style,
+        "food_score": current_user.food_score,
+        "adventure_score": current_user.adventure_score,
+        "culture_score": current_user.culture_score,
+        "shopping_score": current_user.shopping_score
+    }

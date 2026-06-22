@@ -91,3 +91,18 @@ export async function getRecommendations(
 
     return response.json();
 }
+
+export async function getProfile(
+    token: string
+) {
+    const response = await fetch(
+        `${API_URL}/profile`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    return response.json();
+}
