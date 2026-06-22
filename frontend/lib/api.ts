@@ -76,3 +76,18 @@ export async function deleteTrip(
 
     return response.json();
 }
+
+export async function getRecommendations(
+    token: string
+) {
+    const response = await fetch(
+        `${API_URL}/recommendations`,
+        {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }
+    );
+
+    return response.json();
+}

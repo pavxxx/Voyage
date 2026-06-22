@@ -209,3 +209,49 @@ def delete_trip(
     return {
         "message": "Trip deleted successfully"
     }
+
+@app.get("/recommendations")
+def get_recommendations(
+    current_user: User = Depends(get_current_user)
+):
+
+    scores = {
+        "food": current_user.food_score,
+        "adventure": current_user.adventure_score,
+        "culture": current_user.culture_score,
+        "shopping": current_user.shopping_score
+    }
+
+    personality = max(
+        scores,
+        key=scores.get
+    )
+
+    recommendations = {
+        "food": [
+            "Tokyo",
+            "Bangkok",
+            "Seoul"
+        ],
+        "adventure": [
+            "Ladakh",
+            "Iceland",
+            "New Zealand"
+        ],
+        "culture": [
+            "Rome",
+            "Kyoto",
+            "Istanbul"
+        ],
+        "shopping": [
+            "Dubai",
+            "Singapore",
+            "Seoul"
+        ]
+    }
+
+    return {
+        "personality": personality,
+        "recommendations":
+        recommendations[personality]
+    }

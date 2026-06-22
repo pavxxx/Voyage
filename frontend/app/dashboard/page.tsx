@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
     getMyTrips,
-    deleteTrip
+    deleteTrip,
+    getRecommendations
 } from "@/lib/api";
 
 interface Trip {
@@ -18,23 +19,40 @@ interface Trip {
 export default function DashboardPage() {
 
     const [trips, setTrips] = useState<Trip[]>([]);
+    const [personality, setPersonality] = useState("");
+    const [recommendations, setRecommendations] = useState<string[]>([]);
 
     useEffect(() => {
 
-        const fetchTrips = async () => {
+        const fetchData = async () => {
 
-            const token = localStorage.getItem("token");
+            const token = localStorage.getItem(
+                "token"
+            );
 
             if (!token) return;
 
-            const data = await getMyTrips(token);
+            const tripData = await getMyTrips(
+                token
+            );
 
-            console.log(data);
+            setTrips(tripData);
 
-            setTrips(data);
+            const recData =
+                await getRecommendations(
+                    token
+                );
+
+            setPersonality(
+                recData.personality
+            );
+
+            setRecommendations(
+                recData.recommendations
+            );
         };
 
-        fetchTrips();
+        fetchData();
 
     }, []);
 
@@ -42,7 +60,9 @@ export default function DashboardPage() {
         tripId: number
     ) => {
 
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem(
+            "token"
+        );
 
         if (!token) return;
 
@@ -53,7 +73,8 @@ export default function DashboardPage() {
 
         setTrips(
             trips.filter(
-                (trip) => trip.id !== tripId
+                (trip) =>
+                    trip.id !== tripId
             )
         );
     };
@@ -122,6 +143,41 @@ export default function DashboardPage() {
             <div className="mt-8 rounded-3xl border border-zinc-800 p-8">
 
                 <h2 className="text-2xl font-semibold">
+                    Travel Personality
+                </h2>
+
+                <p className="mt-4 text-4xl font-bold text-orange-400 capitalize">
+                    {personality}
+                </p>
+
+            </div>
+
+            <div className="mt-8 rounded-3xl border border-zinc-800 p-8">
+
+                <h2 className="text-2xl font-semibold">
+                    Recommended For You
+                </h2>
+
+                <div className="mt-4 space-y-3">
+
+                    {recommendations.map((place) => (
+
+                        <div
+                            key={place}
+                            className="rounded-xl bg-zinc-900 p-4"
+                        >
+                            {place}
+                        </div>
+
+                    ))}
+
+                </div>
+
+            </div>
+
+            <div className="mt-8 rounded-3xl border border-zinc-800 p-8">
+
+                <h2 className="text-2xl font-semibold">
                     My Trips
                 </h2>
 
@@ -148,7 +204,11 @@ export default function DashboardPage() {
                                 </p>
 
                                 <button
-                                    onClick={() => handleDelete(trip.id)}
+                                    onClick={() =>
+                                        handleDelete(
+                                            trip.id
+                                        )
+                                    }
                                     className="rounded-lg bg-red-500 px-3 py-1 text-sm text-white hover:bg-red-600"
                                 >
                                     Delete
