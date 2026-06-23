@@ -130,11 +130,25 @@ export default function DashboardPage() {
                     </h2>
                 </div>
 
-                <Link href="/create-trip">
-                    <button className="rounded-xl bg-orange-500 px-5 py-3 font-semibold text-black hover:bg-orange-400">
-                        + New Trip
+                <div className="flex gap-3">
+
+                    <Link href="/create-trip">
+                        <button className="rounded-xl bg-orange-500 px-5 py-3 font-semibold text-black hover:bg-orange-400">
+                            + New Trip
+                        </button>
+                    </Link>
+
+                    <button
+                        onClick={() => {
+                            localStorage.removeItem("token");
+                            window.location.href = "/login";
+                        }}
+                        className="rounded-xl bg-red-500 px-5 py-3 font-semibold text-white hover:bg-red-600"
+                    >
+                        Logout
                     </button>
-                </Link>
+
+                </div>
 
             </div>
 
