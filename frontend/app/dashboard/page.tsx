@@ -229,43 +229,48 @@ export default function DashboardPage() {
 
                 <div className="mt-6 space-y-4">
 
-                    {trips.map((trip) => (
+                    {trips.length === 0 ? (
 
-                        <div
-                            key={trip.id}
-                            className="rounded-2xl bg-zinc-900 p-5"
-                        >
-                            <h3 className="text-xl font-semibold">
-                                {trip.destination}
-                            </h3>
+                        <div className="rounded-2xl bg-zinc-900 p-6 text-center text-zinc-400">
+                            No trips planned yet. Click "+ New Trip" to start your next adventure.
+                        </div>
 
-                            <p className="text-zinc-400">
-                                {trip.start_date} - {trip.end_date}
-                            </p>
+                    ) : (
 
-                            <div className="mt-3 flex items-center justify-between">
+                        trips.map((trip) => (
 
-                                <p className="text-orange-400">
-                                    Budget: {trip.budget}
+                            <div
+                                key={trip.id}
+                                className="rounded-2xl bg-zinc-900 p-5"
+                            >
+                                <h3 className="text-xl font-semibold">
+                                    {trip.destination}
+                                </h3>
+
+                                <p className="text-zinc-400">
+                                    {trip.start_date} - {trip.end_date}
                                 </p>
 
-                                <button
-                                    onClick={() =>
-                                        handleDelete(
-                                            trip.id
-                                        )
-                                    }
-                                    className="rounded-lg bg-red-500 px-3 py-1 text-sm text-white hover:bg-red-600"
-                                >
-                                    Delete
-                                </button>
+                                <div className="mt-3 flex items-center justify-between">
+
+                                    <p className="text-orange-400">
+                                        Budget: {trip.budget}
+                                    </p>
+
+                                    <button
+                                        onClick={() => handleDelete(trip.id)}
+                                        className="rounded-lg bg-red-500 px-3 py-1 text-sm text-white hover:bg-red-600"
+                                    >
+                                        Delete
+                                    </button>
+
+                                </div>
 
                             </div>
 
-                        </div>
+                        ))
 
-                    ))}
-
+                    )}
                 </div>
 
             </div>
