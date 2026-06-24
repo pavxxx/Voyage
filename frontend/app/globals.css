@@ -1,26 +1,179 @@
 @import "tailwindcss";
 
+/* ── Design Tokens ── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --ink-navy: #0D1117;
+  --ink-navy-light: #161B22;
+  --ink-navy-lighter: #21262D;
+  --warm-sand: #F5EDD8;
+  --warm-sand-dim: rgba(245, 237, 216, 0.6);
+  --terracotta: #C97B4B;
+  --terracotta-glow: rgba(201, 123, 75, 0.25);
+  --sage: #8CA882;
+  --sage-dim: rgba(140, 168, 130, 0.15);
+  --ghost-white: #FAF8F4;
+  --ghost-white-dim: rgba(250, 248, 244, 0.06);
+  --danger: #E05A47;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ink: var(--ink-navy);
+  --color-ink-light: var(--ink-navy-light);
+  --color-ink-lighter: var(--ink-navy-lighter);
+  --color-sand: var(--warm-sand);
+  --color-sand-dim: var(--warm-sand-dim);
+  --color-terra: var(--terracotta);
+  --color-terra-glow: var(--terracotta-glow);
+  --color-sage: var(--sage);
+  --color-sage-dim: var(--sage-dim);
+  --color-ghost: var(--ghost-white);
+  --color-ghost-dim: var(--ghost-white-dim);
+  --color-danger: var(--danger);
+  --font-display: var(--font-cormorant);
+  --font-body: var(--font-dm-sans);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Global Reset ── */
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: var(--terracotta);
+  color: var(--ghost-white);
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--ink-navy);
+  color: var(--warm-sand);
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--ink-navy);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--ink-navy-lighter);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--terracotta);
+}
+
+/* ── Coordinate Texture ── */
+@keyframes coord-drift {
+  0% { transform: translateY(0) translateX(0); }
+  100% { transform: translateY(-50%) translateX(-2%); }
+}
+
+.coord-texture {
+  position: relative;
+  overflow: hidden;
+}
+
+.coord-texture::before {
+  content:
+    "48.8566° N  2.3522° E  ·  35.6762° N  139.6503° E  ·  40.7128° N  74.0060° W  ·  "
+    "-33.8688° S  151.2093° E  ·  27.1751° N  78.0421° E  ·  51.5074° N  0.1278° W  ·  "
+    "41.0082° N  28.9784° E  ·  -22.9068° S  43.1729° W  ·  55.7558° N  37.6173° E  ·  "
+    "1.3521° N  103.8198° E  ·  25.2048° N  55.2708° E  ·  37.7749° N  122.4194° W  ·  "
+    "48.8566° N  2.3522° E  ·  35.6762° N  139.6503° E  ·  40.7128° N  74.0060° W  ·  "
+    "-33.8688° S  151.2093° E  ·  27.1751° N  78.0421° E  ·  51.5074° N  0.1278° W  ·  "
+    "41.0082° N  28.9784° E  ·  -22.9068° S  43.1729° W  ·  55.7558° N  37.6173° E  ·  "
+    "1.3521° N  103.8198° E  ·  25.2048° N  55.2708° E  ·  37.7749° N  122.4194° W  ·  ";
+  position: absolute;
+  inset: -100% -20%;
+  font-family: var(--font-dm-sans), monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  line-height: 2.4;
+  color: rgba(245, 237, 216, 0.04);
+  white-space: normal;
+  word-break: break-all;
+  pointer-events: none;
+  z-index: 0;
+  animation: coord-drift 90s linear infinite;
+}
+
+/* ── Card Hover Lift ── */
+.card-lift {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 0.3s ease;
+}
+.card-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 40px var(--terracotta-glow);
+}
+
+/* ── Stagger-In Entrance ── */
+@keyframes stagger-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stagger-in > * {
+  opacity: 0;
+  animation: stagger-in 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.stagger-in > *:nth-child(1) { animation-delay: 0.08s; }
+.stagger-in > *:nth-child(2) { animation-delay: 0.16s; }
+.stagger-in > *:nth-child(3) { animation-delay: 0.24s; }
+.stagger-in > *:nth-child(4) { animation-delay: 0.32s; }
+.stagger-in > *:nth-child(5) { animation-delay: 0.40s; }
+.stagger-in > *:nth-child(6) { animation-delay: 0.48s; }
+
+/* ── Fade In ── */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fade-in 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.fade-in-delay-1 { animation-delay: 0.15s; opacity: 0; }
+.fade-in-delay-2 { animation-delay: 0.3s; opacity: 0; }
+.fade-in-delay-3 { animation-delay: 0.45s; opacity: 0; }
+
+/* ── Input Focus ── */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--sage) !important;
+  box-shadow: 0 0 0 3px var(--sage-dim);
+}
+
+/* ── Glass Card ── */
+.glass-card {
+  background: var(--ghost-white-dim);
+  border: 1px solid rgba(245, 237, 216, 0.07);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+/* ── Coord Label (decorative subtext) ── */
+.coord-label {
+  font-family: var(--font-dm-sans), monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: rgba(245, 237, 216, 0.25);
+}
+
+/* ── Light Panel (ghost-white side) ── */
+.light-panel {
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.03);
 }
