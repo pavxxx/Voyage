@@ -74,12 +74,12 @@ export default function CreateTripPage() {
                     <h2 className="font-display text-4xl lg:text-5xl xl:text-6xl font-semibold leading-[1.08] text-sand">
                         Chart your
                         <br />
-                        <span className="italic text-sand/35">next great</span>
+                        <span className="italic text-sand/55">next great</span>
                         <br />
                         adventure.
                     </h2>
 
-                    <p className="mt-5 text-[0.8rem] leading-relaxed text-sand/35 max-w-sm">
+                    <p className="mt-5 text-[0.8rem] leading-relaxed text-sand/60 max-w-sm">
                         Set your destination, dates, and budget — and let our AI companion
                         handle the rest with personalized recommendations and cost predictions.
                     </p>
@@ -112,7 +112,7 @@ export default function CreateTripPage() {
                         Create a new trip
                     </h1>
 
-                    <p className="mt-2 text-[0.75rem] text-ink/40">
+                    <p className="mt-2 text-[0.75rem] text-ink/60">
                         Fill in the details below to plan your next adventure.
                     </p>
 
@@ -122,7 +122,7 @@ export default function CreateTripPage() {
                     >
 
                         <div>
-                            <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/50 mb-1.5">
+                            <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/70 mb-1.5">
                                 Destination
                             </label>
                             <input
@@ -132,13 +132,13 @@ export default function CreateTripPage() {
                                 onChange={(e) =>
                                     setDestination(e.target.value)
                                 }
-                                className="w-full rounded-lg border border-ink/8 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink/25 transition-all duration-300"
+                                className="w-full rounded-lg border border-ink/8 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink/40 transition-all duration-300"
                             />
                         </div>
 
                         <div className="grid grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/50 mb-1.5">
+                                <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/70 mb-1.5">
                                     Start Date
                                 </label>
                                 <input
@@ -151,7 +151,7 @@ export default function CreateTripPage() {
                                 />
                             </div>
                             <div>
-                                <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/50 mb-1.5">
+                                <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/70 mb-1.5">
                                     End Date
                                 </label>
                                 <input
@@ -166,7 +166,7 @@ export default function CreateTripPage() {
                         </div>
 
                         <div>
-                            <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/50 mb-1.5">
+                            <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/70 mb-1.5">
                                 Budget
                             </label>
                             <input

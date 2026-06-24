@@ -52,15 +52,31 @@ function getCoord(place: string): string {
     return COORD_MAP[key] || `${(Math.random() * 90).toFixed(4)}° N  ${(Math.random() * 180).toFixed(4)}° E`;
 }
 
-/* Gradient colors for recommendation cards */
-const CARD_GRADIENTS = [
-    "from-terra/30 via-ink-light to-ink",
-    "from-sage/25 via-ink-light to-ink",
-    "from-sand/15 via-ink-light to-ink",
-    "from-terra/20 via-sage/10 to-ink",
-    "from-sage/20 via-terra/10 to-ink",
-    "from-sand/20 via-ink-light to-ink",
-];
+/* Destination image mapping */
+const DESTINATION_IMAGES: Record<string, string> = {
+    // Local images
+    "tokyo": "/images/tokyo.jpg",
+    "bangkok": "/images/bangkok.jpg",
+    "seoul": "/images/seoul.jpg",
+    "ooty": "/images/ooty.jpg",
+
+    // Curated high-quality travel photography from Unsplash
+    "dubai": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=600&q=80",
+    "singapore": "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=600&q=80",
+    "iceland": "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=600&q=80",
+    "ladakh": "https://images.unsplash.com/photo-1596701062351-df1f8d368903?auto=format&fit=crop&w=600&q=80",
+    "rome": "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=600&q=80",
+    "kyoto": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=600&q=80",
+    "istanbul": "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=600&q=80",
+    "new zealand": "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=600&q=80",
+    "munnar": "https://images.unsplash.com/photo-1506461883276-594a12b11cc3?auto=format&fit=crop&w=600&q=80",
+    "kodaikanal": "https://images.unsplash.com/photo-1626509658207-f822ac7768bb?auto=format&fit=crop&w=600&q=80"
+};
+
+function getImageUrl(place: string): string {
+    const key = place.toLowerCase().trim();
+    return DESTINATION_IMAGES[key] || "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=600&q=80";
+}
 
 export default function DashboardPage() {
 
@@ -190,7 +206,7 @@ export default function DashboardPage() {
                             localStorage.removeItem("token");
                             window.location.href = "/login";
                         }}
-                        className="rounded-full border border-sand/12 px-5 py-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-sand/40 transition-all duration-300 hover:border-danger hover:text-danger"
+                        className="rounded-full border border-sand/20 px-5 py-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.18em] text-sand/65 transition-all duration-300 hover:border-danger hover:text-danger"
                     >
                         Logout
                     </button>
@@ -213,7 +229,7 @@ export default function DashboardPage() {
                         </h2>
                     </div>
 
-                    <p className="max-w-lg text-[0.8rem] leading-relaxed text-sand/35 fade-in fade-in-delay-2">
+                    <p className="max-w-lg text-[0.8rem] leading-relaxed text-sand/60 fade-in fade-in-delay-2">
                         Personalized destinations, intelligent recommendations,
                         and smarter trip planning powered by your travel profile.
                     </p>
@@ -226,7 +242,7 @@ export default function DashboardPage() {
                 <div className="grid gap-4 grid-cols-3 stagger-in">
 
                     <div className="glass-card card-lift rounded-xl p-5 lg:p-6">
-                        <p className="text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-sand/35 mb-2">
+                        <p className="text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-sand/55 mb-2">
                             Travel Style
                         </p>
                         <h3 className="font-display text-2xl md:text-3xl font-semibold capitalize text-sage">
@@ -235,7 +251,7 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="glass-card card-lift rounded-xl p-5 lg:p-6">
-                        <p className="text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-sand/35 mb-2">
+                        <p className="text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-sand/55 mb-2">
                             Budget Profile
                         </p>
                         <h3 className="font-display text-2xl md:text-3xl font-semibold capitalize text-terra">
@@ -244,7 +260,7 @@ export default function DashboardPage() {
                     </div>
 
                     <div className="glass-card card-lift rounded-xl p-5 lg:p-6">
-                        <p className="text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-sand/35 mb-2">
+                        <p className="text-[0.6rem] font-semibold uppercase tracking-[0.22em] text-sand/55 mb-2">
                             Trips Planned
                         </p>
                         <h3 className="font-display text-2xl md:text-3xl font-semibold text-sand">
@@ -265,7 +281,7 @@ export default function DashboardPage() {
                                 {personality || <span className="text-sand/20 italic">Analyzing...</span>}
                             </h2>
                         </div>
-                        <p className="text-[0.75rem] text-sand/30 max-w-xs md:text-right">
+                        <p className="text-[0.75rem] text-sand/55 max-w-xs md:text-right">
                             Recommendations are generated using your travel preferences and style.
                         </p>
                     </div>
@@ -289,9 +305,15 @@ export default function DashboardPage() {
                                     key={place}
                                     className="group card-lift rounded-xl overflow-hidden border border-sand/6 bg-ink-light transition-all duration-400 hover:border-terra/40"
                                 >
-                                    {/* Gradient Header */}
-                                    <div className={`h-28 bg-gradient-to-br ${CARD_GRADIENTS[i % CARD_GRADIENTS.length]} relative`}>
-                                        <p className="absolute bottom-2.5 left-3.5 coord-label">
+                                    {/* Image Header with Gradient Overlay */}
+                                    <div className="h-32 relative overflow-hidden">
+                                        <img 
+                                            src={getImageUrl(place)} 
+                                            alt={place} 
+                                            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-ink-light via-ink-light/40 to-transparent" />
+                                        <p className="absolute bottom-2.5 left-3.5 coord-label z-10">
                                             {getCoord(place)}
                                         </p>
                                     </div>
@@ -300,7 +322,7 @@ export default function DashboardPage() {
                                         <h3 className="font-display text-xl font-semibold text-sand group-hover:text-terra transition-colors duration-300">
                                             {place}
                                         </h3>
-                                        <p className="mt-1.5 text-[0.7rem] text-sand/30">
+                                        <p className="mt-1.5 text-[0.7rem] text-sand/55">
                                             Recommended for your travel personality.
                                         </p>
                                     </div>
@@ -358,7 +380,7 @@ export default function DashboardPage() {
                                             </span>
                                         </div>
 
-                                        <p className="text-[0.7rem] text-sand/30 tracking-wide">
+                                        <p className="text-[0.7rem] text-sand/55 tracking-wide">
                                             {trip.start_date} &nbsp;→&nbsp; {trip.end_date}
                                         </p>
 
@@ -374,7 +396,7 @@ export default function DashboardPage() {
 
                                     <button
                                         onClick={() => handleDelete(trip.id)}
-                                        className="self-start md:self-center rounded-full border border-danger/25 px-4 py-2 text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-danger/60 transition-all duration-300 hover:bg-danger hover:text-ghost hover:border-danger"
+                                        className="self-start md:self-center rounded-full border border-danger/40 px-4 py-2 text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-danger/80 transition-all duration-300 hover:bg-danger hover:text-ghost hover:border-danger"
                                     >
                                         Delete
                                     </button>

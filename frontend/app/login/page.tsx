@@ -62,12 +62,12 @@ export default function LoginPage() {
                     <h2 className="font-display text-4xl lg:text-5xl xl:text-6xl font-semibold leading-[1.08] text-sand">
                         Every journey
                         <br />
-                        <span className="italic text-sand/35">begins with a</span>
+                        <span className="italic text-sand/55">begins with a</span>
                         <br />
                         single step.
                     </h2>
 
-                    <p className="mt-5 text-[0.8rem] leading-relaxed text-sand/35 max-w-sm">
+                    <p className="mt-5 text-[0.8rem] leading-relaxed text-sand/60 max-w-sm">
                         Sign in to access your personalized travel recommendations,
                         trip history, and AI-powered planning tools.
                     </p>
@@ -100,7 +100,7 @@ export default function LoginPage() {
                         Sign in to your account
                     </h1>
 
-                    <p className="mt-2 text-[0.75rem] text-ink/40">
+                    <p className="mt-2 text-[0.75rem] text-ink/60">
                         Continue planning your next adventure with Voyage.
                     </p>
 
@@ -109,7 +109,7 @@ export default function LoginPage() {
                         className="mt-6 space-y-3.5"
                     >
                         <div>
-                            <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/50 mb-1.5">
+                            <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/70 mb-1.5">
                                 Email
                             </label>
                             <input
@@ -124,7 +124,7 @@ export default function LoginPage() {
                         </div>
 
                         <div>
-                            <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/50 mb-1.5">
+                            <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/70 mb-1.5">
                                 Password
                             </label>
                             <input
@@ -148,7 +148,7 @@ export default function LoginPage() {
 
                     </form>
 
-                    <p className="mt-5 text-center text-[0.65rem] text-ink/30">
+                    <p className="mt-5 text-center text-[0.65rem] text-ink/50">
                         Don&apos;t have an account?{" "}
                         <span className="text-terra cursor-pointer hover:underline">
                             Contact us

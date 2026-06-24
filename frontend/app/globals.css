@@ -170,7 +170,8 @@ input:focus, select:focus, textarea:focus {
   font-size: 0.6rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(245, 237, 216, 0.25);
+  color: rgba(245, 237, 216, 0.55);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 /* ── Light Panel (ghost-white side) ── */

@@ -13,7 +13,7 @@ export default function Home() {
           Voyage
         </Link>
 
-        <div className="flex items-center gap-6 text-[0.7rem] tracking-[0.2em] uppercase text-sand/50">
+        <div className="flex items-center gap-6 text-[0.7rem] tracking-[0.2em] uppercase text-sand/70">
           <button className="hidden sm:block transition-colors duration-300 hover:text-sand">
             Features
           </button>
@@ -21,7 +21,7 @@ export default function Home() {
             About
           </button>
           <Link href="/login">
-            <button className="px-5 py-2 rounded-full border border-sand/15 text-sand/80 text-[0.7rem] tracking-[0.2em] uppercase transition-all duration-300 hover:border-terra hover:text-terra">
+            <button className="px-5 py-2 rounded-full border border-sand/15 text-sand/95 text-[0.7rem] tracking-[0.2em] uppercase transition-all duration-300 hover:border-terra hover:text-terra">
               Login
             </button>
           </Link>
@@ -47,7 +47,7 @@ export default function Home() {
             <span className="text-sand/15 italic">Explore Deeper.</span>
           </h1>
 
-          <p className="mt-5 max-w-xl text-sm leading-relaxed text-sand/45 fade-in fade-in-delay-2">
+          <p className="mt-5 max-w-xl text-sm leading-relaxed text-sand/65 fade-in fade-in-delay-2">
             Your intelligent travel companion that learns your preferences,
             predicts costs, discovers hidden gems, and helps you plan better
             journeys — anywhere on the planet.
@@ -61,7 +61,7 @@ export default function Home() {
               </button>
             </Link>
 
-            <button className="rounded-full border border-sand/12 px-7 py-3 text-[0.7rem] uppercase tracking-[0.2em] text-sand/60 transition-all duration-300 hover:border-terra hover:text-terra">
+            <button className="rounded-full border border-sand/12 px-7 py-3 text-[0.7rem] uppercase tracking-[0.2em] text-sand/75 transition-all duration-300 hover:border-terra hover:text-terra">
               Learn More
             </button>
           </div>
@@ -73,7 +73,7 @@ export default function Home() {
             <h2 className="font-display text-2xl sm:text-3xl font-semibold text-terra">
               100+
             </h2>
-            <p className="mt-0.5 text-[0.55rem] uppercase tracking-[0.25em] text-sand/35">
+            <p className="mt-0.5 text-[0.55rem] uppercase tracking-[0.25em] text-sand/55">
               Destinations
             </p>
           </div>
@@ -82,7 +82,7 @@ export default function Home() {
             <h2 className="font-display text-2xl sm:text-3xl font-semibold text-sage">
               AI
             </h2>
-            <p className="mt-0.5 text-[0.55rem] uppercase tracking-[0.25em] text-sand/35">
+            <p className="mt-0.5 text-[0.55rem] uppercase tracking-[0.25em] text-sand/55">
               Personalized
             </p>
           </div>
@@ -91,7 +91,7 @@ export default function Home() {
             <h2 className="font-display text-2xl sm:text-3xl font-semibold text-terra">
               24/7
             </h2>
-            <p className="mt-0.5 text-[0.55rem] uppercase tracking-[0.25em] text-sand/35">
+            <p className="mt-0.5 text-[0.55rem] uppercase tracking-[0.25em] text-sand/55">
               Assistance
             </p>
           </div>
@@ -103,6 +103,96 @@ export default function Home() {
         </p>
 
       </section>
+
+      {/* ── Footer ── */}
+      <footer className="relative z-10 border-t border-sand/5 bg-ink-light/30 backdrop-blur-md px-8 md:px-14 py-16 text-sand/55">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-10">
+          
+          {/* Brand Column */}
+          <div className="max-w-sm">
+            <Link href="/" className="font-display text-2xl font-semibold tracking-wide text-terra hover:text-terra-glow transition-colors duration-300">
+              Voyage
+            </Link>
+            <p className="mt-4 text-[0.8rem] leading-relaxed text-sand/50 font-body">
+              An intelligent, editorial travel companion designed to analyze your travel preferences, predict itinerary budgets, and guide you beyond the ordinary.
+            </p>
+            <p className="mt-8 text-[0.65rem] tracking-[0.1em] text-sand/35 font-body uppercase">
+              &copy; {new Date().getFullYear()} Voyage. All rights reserved.
+            </p>
+          </div>
+
+          {/* Links Grid */}
+          <div className="grid grid-cols-3 gap-12 md:gap-20">
+            <div>
+              <h4 className="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-terra mb-4">
+                Explore
+              </h4>
+              <ul className="space-y-2 text-[0.75rem] font-body text-sand/55">
+                <li>
+                  <button className="hover:text-sand transition-colors duration-300 cursor-pointer">Destinations</button>
+                </li>
+                <li>
+                  <button className="hover:text-sand transition-colors duration-300 cursor-pointer">Travel DNA</button>
+                </li>
+                <li>
+                  <button className="hover:text-sand transition-colors duration-300 cursor-pointer">Itineraries</button>
+                </li>
+                <li>
+                  <button className="hover:text-sand transition-colors duration-300 cursor-pointer">Pricing</button>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-terra mb-4">
+                Company
+              </h4>
+              <ul className="space-y-2 text-[0.75rem] font-body text-sand/55">
+                <li>
+                  <button className="hover:text-sand transition-colors duration-300 cursor-pointer">About Us</button>
+                </li>
+                <li>
+                  <button className="hover:text-sand transition-colors duration-300 cursor-pointer">Journal</button>
+                </li>
+                <li>
+                  <button className="hover:text-sand transition-colors duration-300 cursor-pointer">Careers</button>
+                </li>
+                <li>
+                  <button className="hover:text-sand transition-colors duration-300 cursor-pointer">Contact</button>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="text-[0.65rem] font-semibold uppercase tracking-[0.25em] text-terra mb-4">
+                Legal
+              </h4>
+              <ul className="space-y-2 text-[0.75rem] font-body text-sand/55">
+                <li>
+                  <button className="hover:text-sand transition-colors duration-300 cursor-pointer">Privacy Policy</button>
+                </li>
+                <li>
+                  <button className="hover:text-sand transition-colors duration-300 cursor-pointer">Terms of Service</button>
+                </li>
+                <li>
+                  <button className="hover:text-sand transition-colors duration-300 cursor-pointer">Security</button>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Small decorative coordinate bar at footer bottom */}
+        <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-sand/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="coord-label">
+            48.8566° N &nbsp; 2.3522° E &nbsp; · &nbsp; 35.6762° N &nbsp; 139.6503° E
+          </p>
+          <p className="coord-label">
+            -33.8688° S &nbsp; 151.2093° E &nbsp; · &nbsp; 25.2048° N &nbsp; 55.2708° E
+          </p>
+        </div>
+      </footer>
 
     </main>
   );
