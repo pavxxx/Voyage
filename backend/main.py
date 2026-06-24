@@ -269,3 +269,26 @@ def get_profile(
         "culture_score": current_user.culture_score,
         "shopping_score": current_user.shopping_score
     }
+
+@app.get("/trip-cost/{destination}")
+def get_trip_cost(destination: str):
+
+    cost_map = {
+        "Tokyo": 120000,
+        "Bangkok": 60000,
+        "Dubai": 90000,
+        "Singapore": 85000,
+        "Iceland": 180000,
+        "Ladakh": 50000,
+        "Ooty": 8000,
+"Munnar": 10000,
+"Kodaikanal": 9000,
+    }
+
+    return {
+        "destination": destination,
+        "estimated_cost": cost_map.get(
+            destination,
+            75000
+        )
+    }

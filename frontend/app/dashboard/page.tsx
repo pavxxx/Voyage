@@ -6,7 +6,8 @@ import {
     getMyTrips,
     deleteTrip,
     getRecommendations,
-    getProfile
+    getProfile,
+    getTripCost
 } from "@/lib/api";
 
 interface Trip {
@@ -15,6 +16,7 @@ interface Trip {
     start_date: string;
     end_date: string;
     budget: string;
+    estimated_cost?: number;
 }
 
 interface Profile {
@@ -57,7 +59,26 @@ export default function DashboardPage() {
                     getProfile(token)
                 ]);
 
-                setTrips(tripData);
+                const tripsWithCost = await Promise.all(
+
+                    tripData.map(async (trip: Trip) => {
+
+                        const costData =
+                            await getTripCost(
+                                trip.destination
+                            );
+
+                        return {
+                            ...trip,
+                            estimated_cost:
+                                costData.estimated_cost
+                        };
+
+                    })
+
+                );
+
+                setTrips(tripsWithCost);
 
                 setPersonality(
                     recData.personality
@@ -253,9 +274,17 @@ export default function DashboardPage() {
 
                                 <div className="mt-3 flex items-center justify-between">
 
-                                    <p className="text-orange-400">
-                                        Budget: {trip.budget}
-                                    </p>
+                                    <div>
+
+                                        <p className="text-orange-400">
+                                            Budget: {trip.budget}
+                                        </p>
+
+                                        <p className="text-green-400 text-sm">
+                                            Estimated Cost: ₹{trip.estimated_cost}
+                                        </p>
+
+                                    </div>
 
                                     <button
                                         onClick={() => handleDelete(trip.id)}

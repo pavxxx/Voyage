@@ -106,3 +106,14 @@ export async function getProfile(
 
     return response.json();
 }
+
+export async function getTripCost(
+    destination: string
+) {
+
+    const response = await fetch(
+        `http://127.0.0.1:8000/trip-cost/${destination}`
+    );
+
+    return response.json();
+}
