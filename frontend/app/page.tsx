@@ -21,6 +21,10 @@ export default function Home() {
           >
             About
           </Link>
+          <Link href="/explore"
+            className="hidden sm:block transition-colors duration-300 hover:text-sand">
+            Explore
+          </Link>
           <Link href="/login">
             <button className="px-5 py-2 rounded-full border border-sand/15 text-sand/95 text-[0.7rem] tracking-[0.2em] uppercase transition-all duration-300 hover:border-terra hover:text-terra">
               Login
@@ -38,9 +42,6 @@ export default function Home() {
             27.1751° N &nbsp; 78.0421° E &nbsp; · &nbsp; 48.8566° N &nbsp; 2.3522° E
           </p>
 
-          <p className="mb-3 text-[0.65rem] font-semibold uppercase tracking-[0.4em] text-terra fade-in fade-in-delay-1">
-            AI-Powered Travel Planning
-          </p>
 
           <h1 className="max-w-4xl font-display text-5xl sm:text-6xl md:text-7xl font-semibold leading-[0.92] text-sand fade-in fade-in-delay-1">
             Travel Smarter.
