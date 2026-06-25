@@ -13,6 +13,7 @@ from schemas import (
     TripCreate,
     UserResponse
 )
+from destinations import DESTINATIONS
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -214,46 +215,60 @@ def delete_trip(
 def get_recommendations(
     current_user: User = Depends(get_current_user)
 ):
+    # Safe fallback values for scores
+    user_food = current_user.food_score or 0
+    user_adventure = current_user.adventure_score or 0
+    user_culture = current_user.culture_score or 0
+    user_shopping = current_user.shopping_score or 0
 
-    scores = {
-        "food": current_user.food_score,
-        "adventure": current_user.adventure_score,
-        "culture": current_user.culture_score,
-        "shopping": current_user.shopping_score
+    # Calculate score for every destination
+    ranked_destinations = []
+    for dest in DESTINATIONS:
+        score = (
+            user_food * dest["food"] +
+            user_adventure * dest["adventure"] +
+            user_culture * dest["culture"] +
+            user_shopping * dest["shopping"]
+        )
+        ranked_destinations.append((dest["name"], score))
+
+    # Sort destinations by score in descending order
+    ranked_destinations.sort(key=lambda x: x[1], reverse=True)
+
+    # Get top 3 destinations
+    top_3 = [dest[0] for dest in ranked_destinations[:3]]
+
+    # Heuristic for travel personality label based on user scores
+    user_scores = {
+        "food": user_food,
+        "adventure": user_adventure,
+        "culture": user_culture,
+        "shopping": user_shopping
     }
 
-    personality = max(
-        scores,
-        key=scores.get
-    )
+    sorted_user_scores = sorted(user_scores.values(), reverse=True)
+    max_val = max(user_scores.values())
+    min_val = min(user_scores.values())
 
-    recommendations = {
-        "food": [
-            "Tokyo",
-            "Bangkok",
-            "Seoul"
-        ],
-        "adventure": [
-            "Ladakh",
-            "Iceland",
-            "New Zealand"
-        ],
-        "culture": [
-            "Rome",
-            "Kyoto",
-            "Istanbul"
-        ],
-        "shopping": [
-            "Dubai",
-            "Singapore",
-            "Seoul"
-        ]
-    }
+    # If top two scores are equal, or max-min range is narrow (<= 1), classify as Balanced Traveler
+    if sorted_user_scores[0] == sorted_user_scores[1] or (max_val - min_val) <= 1:
+        personality = "Balanced Traveler"
+    else:
+        dominant = max(user_scores, key=user_scores.get)
+        if dominant == "food":
+            personality = "Food Explorer"
+        elif dominant == "adventure":
+            personality = "Adventure Seeker"
+        elif dominant == "culture":
+            personality = "Culture Enthusiast"
+        elif dominant == "shopping":
+            personality = "Luxury Shopper"
+        else:
+            personality = "Balanced Traveler"
 
     return {
         "personality": personality,
-        "recommendations":
-        recommendations[personality]
+        "recommendations": top_3
     }
 
 @app.get("/profile")
