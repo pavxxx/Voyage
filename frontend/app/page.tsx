@@ -14,12 +14,13 @@ export default function Home() {
         </Link>
 
         <div className="flex items-center gap-6 text-[0.7rem] tracking-[0.2em] uppercase text-sand/70">
-          <button className="hidden sm:block transition-colors duration-300 hover:text-sand">
-            Features
-          </button>
-          <button className="hidden sm:block transition-colors duration-300 hover:text-sand">
+
+          <Link
+            href="/about"
+            className="hidden sm:block transition-colors duration-300 hover:text-sand"
+          >
             About
-          </button>
+          </Link>
           <Link href="/login">
             <button className="px-5 py-2 rounded-full border border-sand/15 text-sand/95 text-[0.7rem] tracking-[0.2em] uppercase transition-all duration-300 hover:border-terra hover:text-terra">
               Login
@@ -107,7 +108,7 @@ export default function Home() {
       {/* ── Footer ── */}
       <footer className="relative z-10 border-t border-sand/5 bg-ink-light/30 backdrop-blur-md px-8 md:px-14 py-16 text-sand/55">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-10">
-          
+
           {/* Brand Column */}
           <div className="max-w-sm">
             <Link href="/" className="font-display text-2xl font-semibold tracking-wide text-terra hover:text-terra-glow transition-colors duration-300">
