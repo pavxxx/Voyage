@@ -43,6 +43,7 @@ export async function createTrip(
         end_date: string;
         budget: string;
         travel_style: string;
+        travellers: number;
     },
     token: string
 ) {

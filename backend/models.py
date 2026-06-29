@@ -41,6 +41,8 @@ class Trip(Base):
 
     travel_style = Column(String)
 
+    travellers = Column(Integer, default=1)
+
     user_id = Column(
         Integer,
         ForeignKey("users.id")

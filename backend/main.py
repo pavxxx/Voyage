@@ -25,6 +25,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl="login"
 )
@@ -138,6 +139,7 @@ def create_trip(
         end_date=trip.end_date,
         budget=trip.budget,
         travel_style=trip.travel_style,
+        travellers=trip.travellers,
         user_id=current_user.id
     )
 

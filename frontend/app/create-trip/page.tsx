@@ -13,9 +13,20 @@ export default function CreateTripPage() {
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [budget, setBudget] = useState("");
-    const [travelStyle, setTravelStyle] = useState("Medium");
+    const [travelStyle, setTravelStyle] = useState("Solo");
     const [isLoading, setIsLoading] = useState(false);
     const [travellers, setTravellers] = useState(1);
+
+    const handleTravelStyleChange = (val: string) => {
+        setTravelStyle(val);
+        if (val === "Solo") {
+            setTravellers(1);
+        } else if (val === "Couple") {
+            setTravellers(2);
+        } else {
+            setTravellers(prev => prev < 2 ? 3 : prev);
+        }
+    };
 
     const handleSubmit = async (
         e: React.FormEvent
@@ -42,6 +53,7 @@ export default function CreateTripPage() {
                     end_date: endDate,
                     budget,
                     travel_style: travelStyle,
+                    travellers,
                 },
                 token
             );
@@ -246,7 +258,7 @@ export default function CreateTripPage() {
                                 </label>
                                 <select
                                     value={travelStyle}
-                                    onChange={(e) => setTravelStyle(e.target.value)}
+                                    onChange={(e) => handleTravelStyleChange(e.target.value)}
                                     className="w-full rounded-lg border border-ink/8 bg-white px-4 py-3 text-sm text-ink transition-all duration-300"
                                 >
                                     <option value="Solo">Solo</option>
@@ -292,7 +304,13 @@ export default function CreateTripPage() {
                             </div>
                         </div>
 
-                        {estimate && (
+                        {estimate && estimate.message && (
+                            <div className="p-3 bg-danger/10 border border-danger/25 text-danger rounded-lg text-xs leading-relaxed font-medium">
+                                {estimate.message}
+                            </div>
+                        )}
+
+                        {estimate && estimate.breakdown && (
                             <div className="receipt-paper p-6 rounded-sm overflow-hidden font-body text-ink">
 
                                 {/* Receipt Head */}

@@ -17,6 +17,7 @@ interface Trip {
     end_date: string;
     budget: string;
     travel_style?: string;
+    travellers?: number;
     estimated_cost?: number;
 }
 
@@ -53,30 +54,9 @@ function getCoord(place: string): string {
     return COORD_MAP[key] || `${(Math.random() * 90).toFixed(4)}° N  ${(Math.random() * 180).toFixed(4)}° E`;
 }
 
-/* Destination image mapping */
-const DESTINATION_IMAGES: Record<string, string> = {
-    // Local images
-    "tokyo": "/images/tokyo.jpg",
-    "bangkok": "/images/bangkok.jpg",
-    "seoul": "/images/seoul.jpg",
-    "ooty": "/images/ooty.jpg",
-
-    // Curated high-quality travel photography from Unsplash
-    "dubai": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=600&q=80",
-    "singapore": "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=600&q=80",
-    "iceland": "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=600&q=80",
-    "ladakh": "https://images.unsplash.com/photo-1596701062351-df1f8d368903?auto=format&fit=crop&w=600&q=80",
-    "rome": "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=600&q=80",
-    "kyoto": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=600&q=80",
-    "istanbul": "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=600&q=80",
-    "new zealand": "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=600&q=80",
-    "munnar": "https://images.unsplash.com/photo-1506461883276-594a12b11cc3?auto=format&fit=crop&w=600&q=80",
-    "kodaikanal": "https://images.unsplash.com/photo-1626509658207-f822ac7768bb?auto=format&fit=crop&w=600&q=80"
-};
-
 function getImageUrl(place: string): string {
-    const key = place.toLowerCase().trim();
-    return DESTINATION_IMAGES[key] || "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=600&q=80";
+    const filename = place.toLowerCase().trim().replace(/\s+/g, '-');
+    return `/images/${filename}.jpg`;
 }
 
 export default function DashboardPage() {
@@ -120,12 +100,7 @@ export default function DashboardPage() {
                         const end = new Date(trip.end_date);
                         const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1);
 
-                        let travellers = 1;
-                        if (trip.travel_style === "Couple") {
-                            travellers = 2;
-                        } else if (trip.travel_style === "Friends" || trip.travel_style === "Family") {
-                            travellers = 3;
-                        }
+                        const travellers = trip.travellers || 1;
 
                         try {
                             const costData = await getTripCost(
@@ -401,32 +376,14 @@ export default function DashboardPage() {
 
                                         <p className="text-[0.7rem] text-sand/55 tracking-wide">
                                             {trip.start_date} &nbsp;→&nbsp; {trip.end_date}
-                                            {(() => {
-                                                const start = new Date(trip.start_date);
-                                                const end = new Date(trip.end_date);
-                                                const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1);
-                                                return ` · ${days} ${days === 1 ? 'Day' : 'Days'}`;
-                                            })()}
                                         </p>
 
-                                        <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1">
+                                        <div className="mt-2 flex items-center gap-5">
                                             <p className="text-[0.8rem] font-medium text-terra">
                                                 Budget: {trip.budget}
                                             </p>
-                                            {trip.travel_style && (
-                                                <p className="text-[0.8rem] font-medium text-sand/70">
-                                                    Type: {trip.travel_style}
-                                                </p>
-                                            )}
                                             <p className="text-[0.8rem] font-medium text-sage">
                                                 Est. Cost: ₹{trip.estimated_cost?.toLocaleString()}
-                                                {trip.travel_style && trip.travel_style !== "Solo" && (() => {
-                                                    const count = trip.travel_style === "Couple" ? 2 : 3;
-                                                    if (trip.estimated_cost) {
-                                                        return ` (₹${Math.round(trip.estimated_cost / count).toLocaleString()} / pers.)`;
-                                                    }
-                                                    return "";
-                                                })()}
                                             </p>
                                         </div>
                                     </div>

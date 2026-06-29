@@ -12,6 +12,7 @@ interface Destination {
     budget: string;
     description: string;
     image: string;
+    imageUrl?: string;
 }
 
 const COORD_MAP: Record<string, string> = {
@@ -43,32 +44,12 @@ function getCoord(place: string): string {
     return COORD_MAP[key] || `${(Math.random() * 90).toFixed(4)}° N  ${(Math.random() * 180).toFixed(4)}° E`;
 }
 
-const DESTINATION_IMAGES: Record<string, string> = {
-    "tokyo": "/images/tokyo.jpg",
-    "bangkok": "/images/bangkok.jpg",
-    "seoul": "/images/seoul.jpg",
-    "ooty": "/images/ooty.jpg",
-    "dubai": "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=600&q=80",
-    "singapore": "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=600&q=80",
-    "iceland": "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?auto=format&fit=crop&w=600&q=80",
-    "ladakh": "https://images.unsplash.com/photo-1596701062351-df1f8d368903?auto=format&fit=crop&w=600&q=80",
-    "rome": "https://images.unsplash.com/photo-1552832230-c0197dd311b5?auto=format&fit=crop&w=600&q=80",
-    "kyoto": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=600&q=80",
-    "istanbul": "https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=600&q=80",
-    "new zealand": "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=600&q=80",
-    "munnar": "https://images.unsplash.com/photo-1506461883276-594a12b11cc3?auto=format&fit=crop&w=600&q=80",
-    "kodaikanal": "https://images.unsplash.com/photo-1626509658207-f822ac7768bb?auto=format&fit=crop&w=600&q=80"
-};
-
 function getImageUrl(name: string, imageFilename?: string): string {
-    const key = name.toLowerCase().trim();
-    if (DESTINATION_IMAGES[key]) {
-        return DESTINATION_IMAGES[key];
-    }
     if (imageFilename) {
         return `/images/${imageFilename}`;
     }
-    return "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=600&q=80";
+    const filename = name.toLowerCase().trim().replace(/\s+/g, '-');
+    return `/images/${filename}.jpg`;
 }
 
 export default function ExplorePage() {
@@ -234,7 +215,7 @@ export default function ExplorePage() {
                                     {/* eslint-disable-next-line @next/next/no-img-element */}
 
                                     <img
-                                        src={`https://picsum.photos/600/400?random=${dest.id}`}
+                                        src={dest.imageUrl}
                                         alt={dest.name}
                                         className="object-cover w-full h-full grayscale-[10%] opacity-85 hover:scale-105 transition-transform duration-700"
                                     />
