@@ -16,6 +16,7 @@ interface Trip {
     start_date: string;
     end_date: string;
     budget: string;
+    travel_style?: string;
     estimated_cost?: number;
 }
 
@@ -115,18 +116,36 @@ export default function DashboardPage() {
                 const tripsWithCost = await Promise.all(
 
                     tripData.map(async (trip: Trip) => {
+                        const start = new Date(trip.start_date);
+                        const end = new Date(trip.end_date);
+                        const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1);
 
-                        const costData =
-                            await getTripCost(
-                                trip.destination
+                        let travellers = 1;
+                        if (trip.travel_style === "Couple") {
+                            travellers = 2;
+                        } else if (trip.travel_style === "Friends" || trip.travel_style === "Family") {
+                            travellers = 3;
+                        }
+
+                        try {
+                            const costData = await getTripCost(
+                                trip.destination,
+                                days,
+                                trip.budget || "Medium",
+                                travellers
                             );
 
-                        return {
-                            ...trip,
-                            estimated_cost:
-                                costData.estimated_cost
-                        };
-
+                            return {
+                                ...trip,
+                                estimated_cost: costData.estimated_cost
+                            };
+                        } catch (err) {
+                            console.error(`Failed to fetch cost for trip to ${trip.destination}:`, err);
+                            return {
+                                ...trip,
+                                estimated_cost: 0
+                            };
+                        }
                     })
 
                 );
@@ -382,14 +401,32 @@ export default function DashboardPage() {
 
                                         <p className="text-[0.7rem] text-sand/55 tracking-wide">
                                             {trip.start_date} &nbsp;→&nbsp; {trip.end_date}
+                                            {(() => {
+                                                const start = new Date(trip.start_date);
+                                                const end = new Date(trip.end_date);
+                                                const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1);
+                                                return ` · ${days} ${days === 1 ? 'Day' : 'Days'}`;
+                                            })()}
                                         </p>
 
-                                        <div className="mt-2 flex items-center gap-5">
+                                        <div className="mt-2 flex flex-wrap items-center gap-x-5 gap-y-1">
                                             <p className="text-[0.8rem] font-medium text-terra">
                                                 Budget: {trip.budget}
                                             </p>
+                                            {trip.travel_style && (
+                                                <p className="text-[0.8rem] font-medium text-sand/70">
+                                                    Type: {trip.travel_style}
+                                                </p>
+                                            )}
                                             <p className="text-[0.8rem] font-medium text-sage">
-                                                Est. Cost: ₹{trip.estimated_cost}
+                                                Est. Cost: ₹{trip.estimated_cost?.toLocaleString()}
+                                                {trip.travel_style && trip.travel_style !== "Solo" && (() => {
+                                                    const count = trip.travel_style === "Couple" ? 2 : 3;
+                                                    if (trip.estimated_cost) {
+                                                        return ` (₹${Math.round(trip.estimated_cost / count).toLocaleString()} / pers.)`;
+                                                    }
+                                                    return "";
+                                                })()}
                                             </p>
                                         </div>
                                     </div>

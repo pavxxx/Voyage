@@ -42,6 +42,7 @@ export async function createTrip(
         start_date: string;
         end_date: string;
         budget: string;
+        travel_style: string;
     },
     token: string
 ) {
@@ -108,12 +109,25 @@ export async function getProfile(
 }
 
 export async function getTripCost(
-    destination: string
+    destination: string,
+    days: number,
+    budget: string,
+    travellers: number
 ) {
 
     const response = await fetch(
-        `http://127.0.0.1:8000/trip-cost/${destination}`
+
+        `${API_URL}/trip-cost/${destination}?days=${days}&budget=${budget}&travellers=${travellers}`
+
     );
 
     return response.json();
+}
+
+export async function getDestinations() {
+    const response = await fetch(
+        "http://127.0.0.1:8000/destinations"
+    );
+
+    return await response.json();
 }

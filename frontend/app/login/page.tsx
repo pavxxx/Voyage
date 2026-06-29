@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { login } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -9,6 +9,13 @@ export default function LoginPage() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [signupSuccess, setSignupSuccess] = useState(false);
+
+    useEffect(() => {
+        if (typeof window !== "undefined" && window.location.search.includes("signup_success=true")) {
+            setSignupSuccess(true);
+        }
+    }, []);
 
     const handleLogin = async (
         e: React.FormEvent
@@ -104,6 +111,12 @@ export default function LoginPage() {
                         Continue planning your next adventure with Voyage.
                     </p>
 
+                    {signupSuccess && (
+                        <div className="mt-4 p-3 bg-sage/10 border border-sage/20 text-sage rounded-lg text-xs leading-relaxed font-medium">
+                            Account created successfully! Please sign in below.
+                        </div>
+                    )}
+
                     <form
                         onSubmit={handleLogin}
                         className="mt-6 space-y-3.5"
@@ -150,9 +163,13 @@ export default function LoginPage() {
 
                     <p className="mt-5 text-center text-[0.65rem] text-ink/50">
                         Don&apos;t have an account?{" "}
-                        <span className="text-terra cursor-pointer hover:underline">
-                            Contact us
-                        </span>
+
+                        <Link
+                            href="/signup"
+                            className="text-terra hover:underline font-medium"
+                        >
+                            Sign Up
+                        </Link>
                     </p>
 
                 </div>

@@ -137,6 +137,7 @@ def create_trip(
         start_date=trip.start_date,
         end_date=trip.end_date,
         budget=trip.budget,
+        travel_style=trip.travel_style,
         user_id=current_user.id
     )
 
@@ -148,7 +149,6 @@ def create_trip(
         "message": "Trip created successfully",
         "trip_id": new_trip.id
     }
-
 @app.get("/trips")
 def get_trips():
 
@@ -286,24 +286,77 @@ def get_profile(
     }
 
 @app.get("/trip-cost/{destination}")
-def get_trip_cost(destination: str):
+def get_trip_cost(
+    destination:str,
+    days:int=3,
+    budget:str="Medium",
+    travellers:int=1
+):
+    # Find destination
+    dest = next(
+        (
+            d for d in DESTINATIONS
+            if d["name"].lower() == destination.lower()
+        ),
+        None
+    )
 
-    cost_map = {
-        "Tokyo": 120000,
-        "Bangkok": 60000,
-        "Dubai": 90000,
-        "Singapore": 85000,
-        "Iceland": 180000,
-        "Ladakh": 50000,
-        "Ooty": 8000,
-"Munnar": 10000,
-"Kodaikanal": 9000,
-    }
+    if not dest:
+        return {
+            "message": "Destination not found."
+        }
+
+    # Select hotel cost based on travel style
+    if budget.lower() == "budget":
+        hotel_cost = dest["hotel_budget"]
+
+    elif budget.lower() == "luxury":
+        hotel_cost = dest["hotel_luxury"]
+
+    else:
+        hotel_cost = dest["hotel_medium"]
+
+    transport = dest["transport"]
+    food = dest["food_per_day"] * days * travellers
+    hotel = hotel_cost * days * travellers
+    activities = dest["activities_per_day"] * days * travellers
+
+    total = (
+        transport +
+        hotel +
+        food +
+        activities
+    )
 
     return {
-        "destination": destination,
-        "estimated_cost": cost_map.get(
-            destination,
-            75000
-        )
+
+        "destination": dest["name"],
+
+        "days": days,
+
+        "budget": budget,
+
+        "breakdown": {
+
+            "transport": transport,
+
+            "hotel": hotel,
+
+            "food": food,
+
+            "activities": activities
+
+        },
+
+        "estimated_cost": total,
+
+        "estimated_range": {
+            "min": int(total * 0.9),
+            "max": int(total * 1.1)
+        }
+
     }
+
+@app.get("/destinations")
+def get_destinations():
+    return DESTINATIONS

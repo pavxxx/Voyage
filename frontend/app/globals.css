@@ -178,3 +178,51 @@ input:focus, select:focus, textarea:focus {
 .light-panel {
   box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.03);
 }
+/* ── Receipt Paper Styling ── */
+.receipt-paper {
+  background-color: #faf6ee;
+  background-image: 
+    linear-gradient(to right, rgba(0, 0, 0, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 0, 0, 0.035) 1px, transparent 1px),
+    linear-gradient(to bottom, #FAF6EE 0%, #F3EDDC 100%);
+  background-size: 16px 16px, 16px 16px, 100% 100%;
+  box-shadow: 
+    0 10px 30px -5px rgba(0, 0, 0, 0.08), 
+    0 4px 12px -2px rgba(0, 0, 0, 0.03),
+    inset 0 1px 0 rgba(255,255,255,0.7);
+  position: relative;
+  border-left: 3px solid rgba(224, 90, 71, 0.45);
+}
+
+/* Interlocking jagged paper teeth at top and bottom */
+.receipt-paper::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background-image: 
+    linear-gradient(135deg, #FAF8F4 4px, transparent 0), 
+    linear-gradient(-135deg, #FAF8F4 4px, transparent 0);
+  background-position: 0 0, 4px 0;
+  background-size: 8px 6px;
+  background-repeat: repeat-x;
+  z-index: 10;
+}
+
+.receipt-paper::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background-image: 
+    linear-gradient(45deg, #FAF8F4 4px, transparent 0), 
+    linear-gradient(-45deg, #FAF8F4 4px, transparent 0);
+  background-position: 0 0, 4px 0;
+  background-size: 8px 6px;
+  background-repeat: repeat-x;
+  z-index: 10;
+}

@@ -25,6 +25,7 @@ class TripCreate(BaseModel):
     start_date: str
     end_date: str
     budget: str
-
+    travel_style: str
+    
 class UserResponse(BaseModel):
     email: str

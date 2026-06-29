@@ -1,19 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createTrip } from "@/lib/api";
+import { createTrip, getTripCost } from "@/lib/api";
 import Link from "next/link";
 
 export default function CreateTripPage() {
 
     const router = useRouter();
-
+    const [estimate, setEstimate] = useState<any>(null);
     const [destination, setDestination] = useState("");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [budget, setBudget] = useState("");
+    const [travelStyle, setTravelStyle] = useState("Medium");
     const [isLoading, setIsLoading] = useState(false);
+    const [travellers, setTravellers] = useState(1);
 
     const handleSubmit = async (
         e: React.FormEvent
@@ -39,6 +41,7 @@ export default function CreateTripPage() {
                     start_date: startDate,
                     end_date: endDate,
                     budget,
+                    travel_style: travelStyle,
                 },
                 token
             );
@@ -53,6 +56,61 @@ export default function CreateTripPage() {
             setIsLoading(false);
         }
     };
+
+    useEffect(() => {
+
+        if (
+            !destination ||
+            !startDate ||
+            !endDate ||
+            !travelStyle
+        ) {
+            setEstimate(null);
+            return;
+        }
+
+        const calculateEstimate = async () => {
+
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+
+            const diff =
+                Math.ceil(
+                    (end.getTime() - start.getTime()) /
+                    (1000 * 60 * 60 * 24)
+                ) + 1;
+
+            if (diff <= 0) return;
+
+            try {
+
+                const data = await getTripCost(
+                    destination,
+                    diff,
+                    budget,
+                    travellers
+                );
+
+                setEstimate(data);
+
+            } catch (err) {
+
+                console.error(err);
+
+            }
+
+        };
+
+        calculateEstimate();
+
+    }, [
+        destination,
+        startDate,
+        endDate,
+        travelStyle,
+        budget,
+        travellers
+    ]);
 
     return (
         <main className="min-h-screen flex bg-ink">
@@ -165,20 +223,204 @@ export default function CreateTripPage() {
                             </div>
                         </div>
 
-                        <div>
-                            <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/70 mb-1.5">
-                                Budget
-                            </label>
-                            <input
-                                type="text"
-                                placeholder="e.g. moderate, luxury, budget"
-                                value={budget}
-                                onChange={(e) =>
-                                    setBudget(e.target.value)
-                                }
-                                className="w-full rounded-lg border border-ink/8 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink/25 transition-all duration-300"
-                            />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                            <div>
+                                <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/70 mb-1.5">
+                                    Budget Tier
+                                </label>
+                                <select
+                                    value={budget}
+                                    onChange={(e) => setBudget(e.target.value)}
+                                    className="w-full rounded-lg border border-ink/8 bg-white px-4 py-3 text-sm text-ink transition-all duration-300"
+                                >
+                                    <option value="">Select Budget</option>
+                                    <option value="Budget">Budget</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Luxury">Luxury</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/70 mb-1.5">
+                                    Travel Type
+                                </label>
+                                <select
+                                    value={travelStyle}
+                                    onChange={(e) => setTravelStyle(e.target.value)}
+                                    className="w-full rounded-lg border border-ink/8 bg-white px-4 py-3 text-sm text-ink transition-all duration-300"
+                                >
+                                    <option value="Solo">Solo</option>
+                                    <option value="Couple">Couple</option>
+                                    <option value="Friends">Friends</option>
+                                    <option value="Family">Family</option>
+                                </select>
+                                {travelStyle === "Family" || travelStyle === "Friends" ? (
+
+                                    <div>
+
+                                        <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/70 mb-1.5">
+                                            Number of Travellers
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            min={2}
+                                            value={travellers}
+                                            onChange={(e) => setTravellers(Number(e.target.value))}
+                                            className="w-full rounded-lg border border-ink/8 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink/25 transition-all duration-300"
+                                        />
+
+                                    </div>
+
+                                ) : (
+
+                                    <div>
+
+                                        <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/70 mb-1.5">
+                                            Travellers
+                                        </label>
+
+                                        <input
+                                            value={travelStyle === "Solo" ? 1 : 2}
+                                            disabled
+                                            className="w-full rounded-lg border border-ink/8 bg-ink/5 text-ink/50 px-4 py-3 text-sm transition-all duration-300 cursor-not-allowed"
+                                        />
+
+                                    </div>
+
+                                )}
+                            </div>
                         </div>
+
+                        {estimate && (
+                            <div className="receipt-paper p-6 rounded-sm overflow-hidden font-body text-ink">
+
+                                {/* Receipt Head */}
+                                <div className="text-center pb-4 border-b border-dashed border-ink/15">
+                                    <p className="text-[0.6rem] font-bold uppercase tracking-[0.3em] text-terra">
+                                        Voyage Cost Ledger
+                                    </p>
+                                    <p className="mt-1 text-[0.55rem] font-mono tracking-widest text-ink/40">
+                                        EST-NO. {Math.floor(100000 + Math.random() * 900000)} / {new Date().toLocaleDateString('en-IN')}
+                                    </p>
+                                </div>
+
+                                {/* Receipt Details List */}
+                                <div className="mt-5 space-y-3 text-xs">
+
+                                    <div className="flex justify-between items-center">
+                                        <span className="uppercase tracking-wider text-[0.65rem] text-ink/60 font-semibold">
+                                            Transport (Round-Trip)
+                                        </span>
+                                        <span className="font-mono text-sm font-semibold text-ink">
+                                            ₹{estimate.breakdown.transport.toLocaleString()}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex justify-between items-center">
+                                        <span className="uppercase tracking-wider text-[0.65rem] text-ink/60 font-semibold">
+                                            Accommodation (Hotel)
+                                        </span>
+                                        <span className="font-mono text-sm font-semibold text-ink">
+                                            ₹{estimate.breakdown.hotel.toLocaleString()}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex justify-between items-center">
+                                        <span className="uppercase tracking-wider text-[0.65rem] text-ink/60 font-semibold">
+                                            Dining & Food
+                                        </span>
+                                        <span className="font-mono text-sm font-semibold text-ink">
+                                            ₹{estimate.breakdown.food.toLocaleString()}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex justify-between items-center">
+                                        <span className="uppercase tracking-wider text-[0.65rem] text-ink/60 font-semibold">
+                                            Activities & Tours
+                                        </span>
+                                        <span className="font-mono text-sm font-semibold text-ink">
+                                            ₹{estimate.breakdown.activities.toLocaleString()}
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                                {/* Dashed Separator */}
+                                <div className="my-5 border-t border-dashed border-ink/15" />
+
+                                {/* Grand Total */}
+                                <div className="flex justify-between items-end">
+                                    <div>
+                                        <span className="block text-[0.55rem] font-bold uppercase tracking-widest text-ink/40 leading-none mb-1">
+                                            Estimated Total
+                                        </span>
+                                        <span className="block text-[0.5rem] text-ink/50 italic font-light">
+                                            *Taxes and extra fees may apply
+                                        </span>
+                                    </div>
+                                    <div className="text-right">
+                                        <span className="font-mono text-3xl font-bold tracking-tight text-ink">
+                                            ₹{estimate.estimated_cost.toLocaleString()}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                {/* Expected Range Section */}
+                                {/* Extra Trip Information */}
+
+                                <div className="mt-5 border-t border-dashed border-ink/15 pt-4 space-y-3 text-xs">
+
+                                    <div className="flex justify-between items-center">
+                                        <span className="uppercase tracking-wider text-[0.65rem] text-ink/60 font-semibold">
+                                            Travellers Count
+                                        </span>
+                                        <span className="font-mono text-sm font-semibold text-ink">
+                                            {travellers}
+                                        </span>
+                                    </div>
+
+                                    <div className="flex justify-between items-center">
+                                        <span className="uppercase tracking-wider text-[0.65rem] text-ink/60 font-semibold">
+                                            Trip Duration
+                                        </span>
+                                        <span className="font-mono text-sm font-semibold text-ink">
+                                            {estimate.days} Days
+                                        </span>
+                                    </div>
+
+                                    <div className="flex justify-between items-center font-semibold pt-2 border-t border-ink/5">
+                                        <span className="uppercase tracking-wider text-[0.65rem] text-terra font-bold">
+                                            Cost Per Person
+                                        </span>
+                                        <span className="font-mono text-base font-bold text-terra">
+                                            ₹{Math.round(
+                                                estimate.estimated_cost / travellers
+                                            ).toLocaleString()}
+                                        </span>
+                                    </div>
+
+                                </div>
+
+                                {/* Expected Range */}
+
+                                <div className="mt-5 pt-4 border-t border-ink/10 bg-ink/[0.02] -mx-6 -mb-6 px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+
+                                    <span className="text-[0.55rem] font-bold uppercase tracking-[0.25em] text-ink/50">
+                                        Expected Range
+                                    </span>
+
+                                    <span className="font-mono text-xs font-bold text-terra">
+                                        ₹{estimate.estimated_range.min.toLocaleString()} –
+                                        ₹{estimate.estimated_range.max.toLocaleString()}
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                        )}
 
                         <button
                             type="submit"

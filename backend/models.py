@@ -39,10 +39,12 @@ class Trip(Base):
 
     budget = Column(String)
 
+    travel_style = Column(String)
+
     user_id = Column(
-    Integer,
-    ForeignKey("users.id")
-)
+        Integer,
+        ForeignKey("users.id")
+    )
 
     user = relationship(
     "User",
