@@ -79,20 +79,24 @@ def create_user(
     db: Session = Depends(get_db)
 ):
 
+    print("Password received:", user.password)
+    print("Password length:", len(user.password))
+    print("Password bytes:", len(user.password.encode("utf-8")))
+
     new_user = User(
-    name=user.name,
-    email=user.email,
-    password=hash_password(user.password),
+        name=user.name,
+        email=user.email,
+        password=hash_password(user.password),
 
-    budget=user.budget,
+        budget=user.budget,
 
-    food_score=user.food_score,
-    adventure_score=user.adventure_score,
-    culture_score=user.culture_score,
-    shopping_score=user.shopping_score,
+        food_score=user.food_score,
+        adventure_score=user.adventure_score,
+        culture_score=user.culture_score,
+        shopping_score=user.shopping_score,
 
-    travel_style=user.travel_style
-)
+        travel_style=user.travel_style
+    )
 
     db.add(new_user)
     db.commit()
@@ -102,7 +106,6 @@ def create_user(
         "message": "User created successfully",
         "user_id": new_user.id
     }
-
 @app.post("/login")
 def login(
     user: UserLogin,
