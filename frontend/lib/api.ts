@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 export async function login(
     email: string,
@@ -48,7 +48,7 @@ export async function createTrip(
     token: string
 ) {
     const response = await fetch(
-        "http://127.0.0.1:8000/trip",
+        `${API_URL}/trip`,
         {
             method: "POST",
             headers: {
@@ -67,7 +67,7 @@ export async function deleteTrip(
     token: string
 ) {
     const response = await fetch(
-        `http://127.0.0.1:8000/trip/${tripId}`,
+        `${API_URL}/trip/${tripId}`,
         {
             method: "DELETE",
             headers: {
@@ -127,7 +127,7 @@ export async function getTripCost(
 
 export async function getDestinations() {
     const response = await fetch(
-        "http://127.0.0.1:8000/destinations"
+        `${API_URL}/destinations`
     );
 
     return await response.json();

@@ -1,6 +1,7 @@
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
 from jose import jwt, JWTError
+import os
 
 pwd_context = CryptContext(
     schemes=["bcrypt"],
@@ -19,7 +20,10 @@ def verify_password(
         hashed_password
     )
 
-SECRET_KEY = "my_super_secret_key"
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    "dev-secret-key-change-this"
+)
 
 ALGORITHM = "HS256"
 

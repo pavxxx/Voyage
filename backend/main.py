@@ -1,10 +1,13 @@
 from fastapi.security import OAuth2PasswordBearer
+from sqlalchemy.orm import Session
 from auth import (
     hash_password,
     verify_password,
     create_access_token,
     verify_token
 )
+import os
+from dotenv import load_dotenv
 from database import engine, SessionLocal
 from models import Base, User, Trip
 from schemas import (
@@ -17,10 +20,18 @@ from destinations import DESTINATIONS
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
+
+load_dotenv()
+
+ALLOWED_ORIGINS = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost:3000"
+).split(",")
+
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -31,8 +42,16 @@ oauth2_scheme = OAuth2PasswordBearer(
 )
 Base.metadata.create_all(bind=engine)
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
 def get_current_user(
-    token: str = Depends(oauth2_scheme)
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)
 ):
 
     email = verify_token(token)
@@ -42,8 +61,6 @@ def get_current_user(
             status_code=401,
             detail="Invalid token"
         )
-
-    db = SessionLocal()
 
     user = db.query(User).filter(
         User.email == email
@@ -57,9 +74,10 @@ def home():
 
 
 @app.post("/user")
-def create_user(user: UserCreate):
-
-    db = SessionLocal()
+def create_user(
+    user: UserCreate,
+    db: Session = Depends(get_db)
+):
 
     new_user = User(
     name=user.name,
@@ -85,19 +103,11 @@ def create_user(user: UserCreate):
         "user_id": new_user.id
     }
 
-@app.get("/users")
-def get_users():
-
-    db = SessionLocal()
-
-    users = db.query(User).all()
-
-    return users
-
 @app.post("/login")
-def login(user: UserLogin):
-
-    db = SessionLocal()
+def login(
+    user: UserLogin,
+    db: Session = Depends(get_db)
+):
 
     db_user = db.query(User).filter(
         User.email == user.email
@@ -128,10 +138,9 @@ def login(user: UserLogin):
 @app.post("/trip")
 def create_trip(
     trip: TripCreate,
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
-
-    db = SessionLocal()
 
     new_trip = Trip(
         destination=trip.destination,
@@ -151,14 +160,7 @@ def create_trip(
         "message": "Trip created successfully",
         "trip_id": new_trip.id
     }
-@app.get("/trips")
-def get_trips():
 
-    db = SessionLocal()
-
-    trips = db.query(Trip).all()
-
-    return trips
 
 @app.get("/me")
 def get_me(token: str = Depends(oauth2_scheme)):
@@ -176,10 +178,9 @@ def get_me(token: str = Depends(oauth2_scheme)):
 
 @app.get("/my-trips")
 def get_my_trips(
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
-
-    db = SessionLocal()
 
     trips = db.query(Trip).filter(
         Trip.user_id == current_user.id
@@ -190,10 +191,9 @@ def get_my_trips(
 @app.delete("/trip/{trip_id}")
 def delete_trip(
     trip_id: int,
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
 ):
-
-    db = SessionLocal()
 
     trip = db.query(Trip).filter(
         Trip.id == trip_id,
