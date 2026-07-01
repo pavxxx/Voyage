@@ -46,7 +46,7 @@ export default function Home() {
           <h1 className="max-w-4xl font-display text-5xl sm:text-6xl md:text-7xl font-semibold leading-[0.92] text-sand fade-in fade-in-delay-1">
             Travel Smarter.
             <br />
-            <span className="text-sand/15 italic">Explore Deeper.</span>
+            <span className="text-terra/80 italic">Explore Deeper.</span>
           </h1>
 
           <p className="mt-5 max-w-xl text-sm leading-relaxed text-sand/65 fade-in fade-in-delay-2">

@@ -219,7 +219,7 @@ export default function DashboardPage() {
                             Welcome,
                         </h1>
 
-                        <h2 className="font-display text-5xl md:text-6xl lg:text-7xl font-semibold leading-[0.88] text-sand/15 italic fade-in fade-in-delay-1">
+                        <h2 className="font-display text-5xl md:text-6xl lg:text-7xl font-semibold leading-[0.88] text-terra/80 italic fade-in fade-in-delay-1">
                             {profile?.name || "Traveler"}.
                         </h2>
                     </div>
