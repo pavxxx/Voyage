@@ -216,10 +216,11 @@ export default function DashboardPage() {
 
                     <div className="flex items-end gap-4 mb-3">
                         <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-semibold leading-[0.88] text-sand fade-in">
-                            Explore
+                            Welcome,
                         </h1>
+
                         <h2 className="font-display text-5xl md:text-6xl lg:text-7xl font-semibold leading-[0.88] text-sand/15 italic fade-in fade-in-delay-1">
-                            Beyond.
+                            {profile?.name || "Traveler"}.
                         </h2>
                     </div>
 
@@ -301,9 +302,9 @@ export default function DashboardPage() {
                                 >
                                     {/* Image Header with Gradient Overlay */}
                                     <div className="h-32 relative overflow-hidden">
-                                        <img 
-                                            src={getImageUrl(place)} 
-                                            alt={place} 
+                                        <img
+                                            src={getImageUrl(place)}
+                                            alt={place}
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                         />
                                         <div className="absolute inset-0 bg-gradient-to-t from-ink-light via-ink-light/40 to-transparent" />
