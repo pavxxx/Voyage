@@ -132,3 +132,21 @@ export async function getDestinations() {
 
     return await response.json();
 }
+
+export async function forgotPassword(email: string) {
+    const response = await fetch(`${API_URL}/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+    });
+    return response.json();
+}
+
+export async function resetPassword(token: string, new_password: string) {
+    const response = await fetch(`${API_URL}/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, new_password }),
+    });
+    return response.json();
+}

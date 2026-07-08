@@ -226,3 +226,93 @@ input:focus, select:focus, textarea:focus {
   background-repeat: repeat-x;
   z-index: 10;
 }
+
+/* ── Toast Notifications ── */
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(110%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes toast-slide-out {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(110%);
+  }
+}
+
+.toast-enter {
+  animation: toast-slide-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.toast-exit {
+  animation: toast-slide-out 0.3s cubic-bezier(0.55, 0, 1, 0.45) forwards;
+}
+
+/* ── Field Error Fade ── */
+@keyframes field-error-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.field-error {
+  animation: field-error-in 0.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ── Password Strength Bar ── */
+.strength-bar-track {
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(13, 17, 23, 0.1);
+  overflow: hidden;
+}
+
+.strength-bar-fill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.4s ease;
+}
+
+/* ── Delete Confirmation Modal ── */
+@keyframes modal-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes modal-scale-in {
+  from { opacity: 0; transform: scale(0.94) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.modal-overlay {
+  animation: modal-fade-in 0.2s ease forwards;
+}
+
+.modal-panel {
+  animation: modal-scale-in 0.25s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* ── Password Requirement Item ── */
+@keyframes req-check-in {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.req-check {
+  animation: req-check-in 0.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}

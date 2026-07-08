@@ -14,11 +14,15 @@ from schemas import (
     UserCreate,
     UserLogin,
     TripCreate,
-    UserResponse
+    UserResponse,
+    ForgotPasswordRequest,
+    ResetPasswordRequest,
 )
 from destinations import DESTINATIONS
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from password_reset import create_reset_token, verify_reset_token, consume_reset_token
+from email_service import send_reset_email
 
 
 load_dotenv()
@@ -365,3 +369,60 @@ def get_trip_cost(
 @app.get("/destinations")
 def get_destinations():
     return DESTINATIONS
+
+
+# ── Forgot Password ─────────────────────────────────────────────────────────
+
+@app.post("/forgot-password")
+def forgot_password(
+    body: ForgotPasswordRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Request a password-reset link.
+    Always returns a generic success message regardless of whether the email
+    exists — this prevents user enumeration.
+    """
+    user = db.query(User).filter(User.email == body.email).first()
+
+    if user:
+        raw_token = create_reset_token(user.id, db)
+        send_reset_email(user.email, raw_token)
+
+    # Return generic message even if user not found
+    return {
+        "message": "If this email is registered, you will receive a reset link shortly."
+    }
+
+
+@app.post("/reset-password")
+def reset_password(
+    body: ResetPasswordRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Validate the token and update the user's password.
+    """
+    if len(body.new_password) < 8:
+        raise HTTPException(
+            status_code=400,
+            detail="Password must be at least 8 characters.",
+        )
+
+    db_token = verify_reset_token(body.token, db)
+    if not db_token:
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid or expired reset token.",
+        )
+
+    # Update the user's password
+    user = db.query(User).filter(User.id == db_token.user_id).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    user.password = hash_password(body.new_password)
+    consume_reset_token(db_token, db)
+    db.commit()
+
+    return {"message": "Password updated successfully."}

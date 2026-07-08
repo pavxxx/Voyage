@@ -7,8 +7,9 @@ import {
     deleteTrip,
     getRecommendations,
     getProfile,
-    getTripCost
+    getTripCost,
 } from "@/lib/api";
+import { useToast } from "@/context/ToastContext";
 
 interface Trip {
     id: number;
@@ -55,11 +56,78 @@ function getCoord(place: string): string {
 }
 
 function getImageUrl(place: string): string {
-    const filename = place.toLowerCase().trim().replace(/\s+/g, '-');
+    const filename = place.toLowerCase().trim().replace(/\s+/g, "-");
     return `/images/${filename}.jpg`;
 }
 
+/** Delete Confirmation Modal */
+function DeleteModal({
+    trip,
+    onCancel,
+    onConfirm,
+    isDeleting,
+}: {
+    trip: Trip;
+    onCancel: () => void;
+    onConfirm: () => void;
+    isDeleting: boolean;
+}) {
+    return (
+        <div
+            className="modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4"
+            style={{ backgroundColor: "rgba(13,17,23,0.75)", backdropFilter: "blur(4px)" }}
+            onClick={(e) => {
+                if (e.target === e.currentTarget) onCancel();
+            }}
+        >
+            <div className="modal-panel w-full max-w-sm rounded-2xl bg-ghost border border-ink/8 shadow-[0_24px_60px_rgba(0,0,0,0.35)] p-7">
+
+                {/* Icon */}
+                <div className="mb-4 w-10 h-10 rounded-full bg-danger/10 border border-danger/20 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                        stroke="#E05A47" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round"
+                        className="w-5 h-5">
+                        <polyline points="3 6 5 6 21 6" />
+                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                        <path d="M10 11v6M14 11v6" />
+                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+                    </svg>
+                </div>
+
+                <h2 className="font-display text-2xl font-semibold text-ink mb-1">
+                    Delete Trip?
+                </h2>
+                <p className="text-[0.75rem] text-ink/60 mb-1.5">
+                    <span className="font-medium text-ink/80">{trip.destination}</span>
+                </p>
+                <p className="text-[0.72rem] text-ink/50 mb-6">
+                    This action cannot be undone.
+                </p>
+
+                <div className="flex gap-3">
+                    <button
+                        onClick={onCancel}
+                        disabled={isDeleting}
+                        className="flex-1 rounded-lg border border-ink/12 px-4 py-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.15em] text-ink/70 transition-all duration-200 hover:border-ink/25 hover:text-ink disabled:opacity-50"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        disabled={isDeleting}
+                        className="flex-1 rounded-lg bg-danger px-4 py-2.5 text-[0.65rem] font-semibold uppercase tracking-[0.15em] text-ghost transition-all duration-200 hover:bg-danger/85 hover:shadow-[0_4px_20px_rgba(224,90,71,0.3)] disabled:opacity-60 disabled:cursor-not-allowed"
+                    >
+                        {isDeleting ? "Deleting..." : "Delete"}
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
 export default function DashboardPage() {
+
+    const { showToast } = useToast();
 
     const [trips, setTrips] = useState<Trip[]>([]);
     const [personality, setPersonality] = useState("");
@@ -68,38 +136,36 @@ export default function DashboardPage() {
     const [profile, setProfile] = useState<Profile>({
         name: "",
         budget: "",
-        travel_style: ""
+        travel_style: "",
     });
+
+    // Delete modal state
+    const [tripToDelete, setTripToDelete] = useState<Trip | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
 
         const fetchData = async () => {
 
-            const token = localStorage.getItem(
-                "token"
-            );
-
+            const token = localStorage.getItem("token");
             if (!token) return;
 
             try {
 
-                const [
-                    tripData,
-                    recData,
-                    profileData
-                ] = await Promise.all([
+                const [tripData, recData, profileData] = await Promise.all([
                     getMyTrips(token),
                     getRecommendations(token),
-                    getProfile(token)
+                    getProfile(token),
                 ]);
 
                 const tripsWithCost = await Promise.all(
-
                     tripData.map(async (trip: Trip) => {
                         const start = new Date(trip.start_date);
                         const end = new Date(trip.end_date);
-                        const days = Math.max(1, Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1);
-
+                        const days = Math.max(
+                            1,
+                            Math.ceil((end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)) + 1
+                        );
                         const travellers = trip.travellers || 1;
 
                         try {
@@ -109,78 +175,66 @@ export default function DashboardPage() {
                                 trip.budget || "Medium",
                                 travellers
                             );
-
-                            return {
-                                ...trip,
-                                estimated_cost: costData.estimated_cost
-                            };
-                        } catch (err) {
-                            console.error(`Failed to fetch cost for trip to ${trip.destination}:`, err);
-                            return {
-                                ...trip,
-                                estimated_cost: 0
-                            };
+                            return { ...trip, estimated_cost: costData.estimated_cost };
+                        } catch {
+                            return { ...trip, estimated_cost: 0 };
                         }
                     })
-
                 );
 
                 setTrips(tripsWithCost);
-
-                setPersonality(
-                    recData.personality
-                );
-
-                setRecommendations(
-                    recData.recommendations
-                );
-
+                setPersonality(recData.personality);
+                setRecommendations(recData.recommendations);
                 setProfile({
                     name: profileData.name || "",
                     budget: profileData.budget || "",
-                    travel_style:
-                        profileData.travel_style || ""
+                    travel_style: profileData.travel_style || "",
                 });
 
             } catch (error) {
-
-                console.error(
-                    "Dashboard fetch error:",
-                    error
-                );
-
+                console.error("Dashboard fetch error:", error);
             }
         };
 
         fetchData();
-
     }, []);
 
-    const handleDelete = async (
-        tripId: number
-    ) => {
+    /** Triggered by clicking Delete — opens the confirmation modal */
+    const requestDelete = (trip: Trip) => {
+        setTripToDelete(trip);
+    };
 
-        const token = localStorage.getItem(
-            "token"
-        );
-
+    /** Confirmed delete flow */
+    const confirmDelete = async () => {
+        if (!tripToDelete) return;
+        const token = localStorage.getItem("token");
         if (!token) return;
 
-        await deleteTrip(
-            tripId,
-            token
-        );
-
-        setTrips(
-            trips.filter(
-                (trip) =>
-                    trip.id !== tripId
-            )
-        );
+        setIsDeleting(true);
+        try {
+            await deleteTrip(tripToDelete.id, token);
+            setTrips((prev) => prev.filter((t) => t.id !== tripToDelete.id));
+            showToast(`Trip to ${tripToDelete.destination} deleted.`, "success");
+        } catch {
+            showToast("Failed to delete trip. Please try again.", "error");
+        } finally {
+            setIsDeleting(false);
+            setTripToDelete(null);
+        }
     };
 
     return (
         <main className="min-h-screen bg-ink text-sand">
+
+            {/* Delete Confirmation Modal */}
+            {tripToDelete && (
+                <DeleteModal
+                    trip={tripToDelete}
+                    onCancel={() => setTripToDelete(null)}
+                    onConfirm={confirmDelete}
+                    isDeleting={isDeleting}
+                />
+            )}
 
             {/* ── Top Nav Bar ── */}
             <nav className="flex items-center justify-between px-6 md:px-10 lg:px-14 py-4 border-b border-sand/6">
@@ -218,7 +272,6 @@ export default function DashboardPage() {
                         <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-semibold leading-[0.88] text-sand fade-in">
                             Welcome,
                         </h1>
-
                         <h2 className="font-display text-5xl md:text-6xl lg:text-7xl font-semibold leading-[0.88] text-terra/80 italic fade-in fade-in-delay-1">
                             {profile?.name || "Traveler"}.
                         </h2>
@@ -295,12 +348,11 @@ export default function DashboardPage() {
 
                     {recommendations.length > 0 ? (
                         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 stagger-in">
-                            {recommendations.map((place, i) => (
+                            {recommendations.map((place) => (
                                 <div
                                     key={place}
                                     className="group card-lift rounded-xl overflow-hidden border border-sand/6 bg-ink-light transition-all duration-400 hover:border-terra/40"
                                 >
-                                    {/* Image Header with Gradient Overlay */}
                                     <div className="h-32 relative overflow-hidden">
                                         <img
                                             src={getImageUrl(place)}
@@ -347,7 +399,6 @@ export default function DashboardPage() {
                     <div className="space-y-3 stagger-in">
 
                         {trips.length === 0 ? (
-
                             <div className="glass-card rounded-xl p-8 text-center">
                                 <p className="font-display text-xl text-sand/20 italic">
                                     No trips planned yet.
@@ -356,11 +407,8 @@ export default function DashboardPage() {
                                     Click &quot;+ New Trip&quot; to start your next adventure.
                                 </p>
                             </div>
-
                         ) : (
-
                             trips.map((trip) => (
-
                                 <div
                                     key={trip.id}
                                     className="glass-card card-lift rounded-xl p-5 md:p-6 flex flex-col md:flex-row md:items-center justify-between gap-3"
@@ -390,15 +438,14 @@ export default function DashboardPage() {
                                     </div>
 
                                     <button
-                                        onClick={() => handleDelete(trip.id)}
-                                        className="self-start md:self-center rounded-full border border-danger/40 px-4 py-2 text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-danger/80 transition-all duration-300 hover:bg-danger hover:text-ghost hover:border-danger"
+                                        onClick={() => requestDelete(trip)}
+                                        disabled={isDeleting && tripToDelete?.id === trip.id}
+                                        className="self-start md:self-center rounded-full border border-danger/40 px-4 py-2 text-[0.6rem] font-semibold uppercase tracking-[0.18em] text-danger/80 transition-all duration-300 hover:bg-danger hover:text-ghost hover:border-danger disabled:opacity-50 disabled:cursor-not-allowed"
                                     >
                                         Delete
                                     </button>
                                 </div>
-
                             ))
-
                         )}
 
                     </div>

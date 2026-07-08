@@ -30,3 +30,12 @@ class TripCreate(BaseModel):
     
 class UserResponse(BaseModel):
     email: str
+
+# ── Forgot / Reset Password ─────────────────────────────────────────────────
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+class ResetPasswordRequest(BaseModel):
+    token: str
+    new_password: str

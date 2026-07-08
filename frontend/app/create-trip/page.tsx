@@ -4,10 +4,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createTrip, getTripCost } from "@/lib/api";
 import Link from "next/link";
+import { useToast } from "@/context/ToastContext";
 
 export default function CreateTripPage() {
 
     const router = useRouter();
+    const { showToast } = useToast();
+
     const [estimate, setEstimate] = useState<any>(null);
     const [destination, setDestination] = useState("");
     const [startDate, setStartDate] = useState("");
@@ -16,6 +19,7 @@ export default function CreateTripPage() {
     const [travelStyle, setTravelStyle] = useState("Solo");
     const [isLoading, setIsLoading] = useState(false);
     const [travellers, setTravellers] = useState(1);
+    const [formError, setFormError] = useState("");
 
     const handleTravelStyleChange = (val: string) => {
         setTravelStyle(val);
@@ -24,23 +28,19 @@ export default function CreateTripPage() {
         } else if (val === "Couple") {
             setTravellers(2);
         } else {
-            setTravellers(prev => prev < 2 ? 3 : prev);
+            setTravellers((prev) => (prev < 2 ? 3 : prev));
         }
     };
 
-    const handleSubmit = async (
-        e: React.FormEvent
-    ) => {
-
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setFormError("");
         setIsLoading(true);
 
-        const token = localStorage.getItem(
-            "token"
-        );
+        const token = localStorage.getItem("token");
 
         if (!token) {
-            alert("Please login first");
+            setFormError("You must be logged in to create a trip.");
             setIsLoading(false);
             return;
         }
@@ -59,11 +59,11 @@ export default function CreateTripPage() {
             );
 
             console.log(data);
-
+            showToast(`Trip to ${destination} created successfully!`, "success");
             router.push("/dashboard");
         } catch (error) {
             console.error(error);
-            alert("Failed to create trip");
+            setFormError("Failed to create trip. Please try again.");
         } finally {
             setIsLoading(false);
         }
@@ -71,12 +71,7 @@ export default function CreateTripPage() {
 
     useEffect(() => {
 
-        if (
-            !destination ||
-            !startDate ||
-            !endDate ||
-            !travelStyle
-        ) {
+        if (!destination || !startDate || !endDate || !travelStyle) {
             setEstimate(null);
             return;
         }
@@ -85,44 +80,24 @@ export default function CreateTripPage() {
 
             const start = new Date(startDate);
             const end = new Date(endDate);
-
             const diff =
                 Math.ceil(
-                    (end.getTime() - start.getTime()) /
-                    (1000 * 60 * 60 * 24)
+                    (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
                 ) + 1;
 
             if (diff <= 0) return;
 
             try {
-
-                const data = await getTripCost(
-                    destination,
-                    diff,
-                    budget,
-                    travellers
-                );
-
+                const data = await getTripCost(destination, diff, budget, travellers);
                 setEstimate(data);
-
             } catch (err) {
-
                 console.error(err);
-
             }
-
         };
 
         calculateEstimate();
 
-    }, [
-        destination,
-        startDate,
-        endDate,
-        travelStyle,
-        budget,
-        travellers
-    ]);
+    }, [destination, startDate, endDate, travelStyle, budget, travellers]);
 
     return (
         <main className="min-h-screen flex bg-ink">
@@ -186,22 +161,25 @@ export default function CreateTripPage() {
                         Fill in the details below to plan your next adventure.
                     </p>
 
-                    <form
-                        onSubmit={handleSubmit}
-                        className="mt-6 space-y-3.5"
-                    >
+                    <form onSubmit={handleSubmit} className="mt-6 space-y-3.5">
+
+                        {/* Form-level error */}
+                        {formError && (
+                            <div className="p-3 bg-danger/10 border border-danger/25 text-danger rounded-lg text-xs leading-relaxed field-error">
+                                {formError}
+                            </div>
+                        )}
 
                         <div>
                             <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/70 mb-1.5">
                                 Destination
                             </label>
                             <input
+                                id="trip-destination"
                                 type="text"
                                 placeholder="Where are you going?"
                                 value={destination}
-                                onChange={(e) =>
-                                    setDestination(e.target.value)
-                                }
+                                onChange={(e) => setDestination(e.target.value)}
                                 className="w-full rounded-lg border border-ink/8 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink/40 transition-all duration-300"
                             />
                         </div>
@@ -212,11 +190,10 @@ export default function CreateTripPage() {
                                     Start Date
                                 </label>
                                 <input
+                                    id="trip-start-date"
                                     type="date"
                                     value={startDate}
-                                    onChange={(e) =>
-                                        setStartDate(e.target.value)
-                                    }
+                                    onChange={(e) => setStartDate(e.target.value)}
                                     className="w-full rounded-lg border border-ink/8 bg-white px-4 py-3 text-sm text-ink transition-all duration-300"
                                 />
                             </div>
@@ -225,11 +202,10 @@ export default function CreateTripPage() {
                                     End Date
                                 </label>
                                 <input
+                                    id="trip-end-date"
                                     type="date"
                                     value={endDate}
-                                    onChange={(e) =>
-                                        setEndDate(e.target.value)
-                                    }
+                                    onChange={(e) => setEndDate(e.target.value)}
                                     className="w-full rounded-lg border border-ink/8 bg-white px-4 py-3 text-sm text-ink transition-all duration-300"
                                 />
                             </div>
@@ -241,6 +217,7 @@ export default function CreateTripPage() {
                                     Budget Tier
                                 </label>
                                 <select
+                                    id="trip-budget"
                                     value={budget}
                                     onChange={(e) => setBudget(e.target.value)}
                                     className="w-full rounded-lg border border-ink/8 bg-white px-4 py-3 text-sm text-ink transition-all duration-300"
@@ -257,6 +234,7 @@ export default function CreateTripPage() {
                                     Travel Type
                                 </label>
                                 <select
+                                    id="trip-travel-style"
                                     value={travelStyle}
                                     onChange={(e) => handleTravelStyleChange(e.target.value)}
                                     className="w-full rounded-lg border border-ink/8 bg-white px-4 py-3 text-sm text-ink transition-all duration-300"
@@ -267,13 +245,10 @@ export default function CreateTripPage() {
                                     <option value="Family">Family</option>
                                 </select>
                                 {travelStyle === "Family" || travelStyle === "Friends" ? (
-
-                                    <div>
-
+                                    <div className="mt-2">
                                         <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/70 mb-1.5">
                                             Number of Travellers
                                         </label>
-
                                         <input
                                             type="number"
                                             min={2}
@@ -281,25 +256,18 @@ export default function CreateTripPage() {
                                             onChange={(e) => setTravellers(Number(e.target.value))}
                                             className="w-full rounded-lg border border-ink/8 bg-white px-4 py-3 text-sm text-ink placeholder:text-ink/25 transition-all duration-300"
                                         />
-
                                     </div>
-
                                 ) : (
-
-                                    <div>
-
+                                    <div className="mt-2">
                                         <label className="block text-[0.6rem] font-semibold uppercase tracking-[0.2em] text-ink/70 mb-1.5">
                                             Travellers
                                         </label>
-
                                         <input
                                             value={travelStyle === "Solo" ? 1 : 2}
                                             disabled
                                             className="w-full rounded-lg border border-ink/8 bg-ink/5 text-ink/50 px-4 py-3 text-sm transition-all duration-300 cursor-not-allowed"
                                         />
-
                                     </div>
-
                                 )}
                             </div>
                         </div>
@@ -319,7 +287,7 @@ export default function CreateTripPage() {
                                         Voyage Cost Ledger
                                     </p>
                                     <p className="mt-1 text-[0.55rem] font-mono tracking-widest text-ink/40">
-                                        EST-NO. {Math.floor(100000 + Math.random() * 900000)} / {new Date().toLocaleDateString('en-IN')}
+                                        EST-NO. {Math.floor(100000 + Math.random() * 900000)} / {new Date().toLocaleDateString("en-IN")}
                                     </p>
                                 </div>
 
@@ -346,7 +314,7 @@ export default function CreateTripPage() {
 
                                     <div className="flex justify-between items-center">
                                         <span className="uppercase tracking-wider text-[0.65rem] text-ink/60 font-semibold">
-                                            Dining & Food
+                                            Dining &amp; Food
                                         </span>
                                         <span className="font-mono text-sm font-semibold text-ink">
                                             ₹{estimate.breakdown.food.toLocaleString()}
@@ -355,7 +323,7 @@ export default function CreateTripPage() {
 
                                     <div className="flex justify-between items-center">
                                         <span className="uppercase tracking-wider text-[0.65rem] text-ink/60 font-semibold">
-                                            Activities & Tours
+                                            Activities &amp; Tours
                                         </span>
                                         <span className="font-mono text-sm font-semibold text-ink">
                                             ₹{estimate.breakdown.activities.toLocaleString()}
@@ -384,9 +352,7 @@ export default function CreateTripPage() {
                                     </div>
                                 </div>
 
-                                {/* Expected Range Section */}
-                                {/* Extra Trip Information */}
-
+                                {/* Extra Trip Info */}
                                 <div className="mt-5 border-t border-dashed border-ink/15 pt-4 space-y-3 text-xs">
 
                                     <div className="flex justify-between items-center">
@@ -412,35 +378,28 @@ export default function CreateTripPage() {
                                             Cost Per Person
                                         </span>
                                         <span className="font-mono text-base font-bold text-terra">
-                                            ₹{Math.round(
-                                                estimate.estimated_cost / travellers
-                                            ).toLocaleString()}
+                                            ₹{Math.round(estimate.estimated_cost / travellers).toLocaleString()}
                                         </span>
                                     </div>
 
                                 </div>
 
                                 {/* Expected Range */}
-
                                 <div className="mt-5 pt-4 border-t border-ink/10 bg-ink/[0.02] -mx-6 -mb-6 px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-
                                     <span className="text-[0.55rem] font-bold uppercase tracking-[0.25em] text-ink/50">
                                         Expected Range
                                     </span>
-
                                     <span className="font-mono text-xs font-bold text-terra">
                                         ₹{estimate.estimated_range.min.toLocaleString()} –
                                         ₹{estimate.estimated_range.max.toLocaleString()}
                                     </span>
-
                                 </div>
 
                             </div>
-
-
                         )}
 
                         <button
+                            id="create-trip-submit"
                             type="submit"
                             disabled={isLoading}
                             className="w-full rounded-lg bg-terra px-4 py-3 font-semibold text-[0.7rem] uppercase tracking-[0.2em] text-ghost transition-all duration-300 hover:shadow-[0_8px_30px_rgba(201,123,75,0.25)] hover:scale-[1.02] disabled:opacity-60 disabled:cursor-not-allowed"
